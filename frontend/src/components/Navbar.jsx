@@ -6,6 +6,7 @@ const AppNavbar = () => {
   const [currentDate, setCurrentDate] = useState("");
   const [currentTime, setCurrentTime] = useState("");
 
+  
   useEffect(() => {
     const updateDateTime = () => {
       const now = new Date();
