@@ -1,8 +1,13 @@
+import AppNavbar from "../src/components/Navbar";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+
 function App() {
   return (
-    <div>
-      <h1>Hydroponic Monitoring Dashboard</h1>
-    </div>
+    <>
+    <AppNavbar>
+    </AppNavbar>
+    </>
   );
 }
 
