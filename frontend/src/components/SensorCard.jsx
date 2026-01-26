@@ -1,7 +1,10 @@
 import React from 'react';
-import { Card } from 'react-bootstrap';
+import { Card, Spinner } from 'react-bootstrap';
 
-const SensorCard = ({ title, value, unit, status, color, icon: Icon }) => {
+const SensorCard = ({ title, value, unit, status, color, icon: Icon, loading = false }) => {
+  const displayValue = value ?? 'N/A';
+  const displayStatus = status ?? 'N/A';
+
   return (
     <Card className="border-0 shadow-sm h-100" style={{ borderRadius: '16px' }}>
       <Card.Body className="p-4 d-flex flex-column">
@@ -31,16 +34,12 @@ const SensorCard = ({ title, value, unit, status, color, icon: Icon }) => {
         <div className="mt-auto">
           <div className="d-flex align-items-baseline mb-1">
             <h2 className="fw-bold mb-0 text-dark" style={{ fontSize: '2.5rem' }}>
-              {value}
+              {loading ? <Spinner animation="border" size="sm" /> : displayValue}
             </h2>
-            {unit && (
-              <span className="text-secondary ms-1" style={{ fontSize: '1rem' }}>
-                {unit}
-              </span>
-            )}
+            {unit && <span className="text-secondary ms-1" style={{ fontSize: '1rem' }}>{unit}</span>}
           </div>
           <div className="fw-medium" style={{ color: color, fontSize: '0.9rem' }}>
-            {status}
+            {loading ? 'Loading...' : displayStatus}
           </div>
         </div>
 
