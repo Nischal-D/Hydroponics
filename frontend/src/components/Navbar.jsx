@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Container, Navbar, Button } from "react-bootstrap";
-import { Leaf, User } from "lucide-react";
+import { Container, Navbar, Button, Modal } from "react-bootstrap";
+import { Leaf, User, LogOut, AlertTriangle } from "lucide-react";
 
-const AppNavbar = () => {
+const AppNavbar = ({ onLogout }) => {
   const [currentDate, setCurrentDate] = useState("");
   const [currentTime, setCurrentTime] = useState("");
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  
+
   useEffect(() => {
     const updateDateTime = () => {
       const now = new Date();
@@ -35,73 +36,125 @@ const AppNavbar = () => {
     alert("Admin button clicked! You can open a dropdown or navigate here.");
   };
 
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
+    setShowLogoutConfirm(false);
+    onLogout();
+  };
+
   return (
-    <Navbar
-      style={{ backgroundColor: "#43a459" }}
-      variant="dark"
-      expand="lg"
-      fixed="top"
-      className="shadow"
-    >
-      <Container fluid className="px-4 position-relative d-flex align-items-center">
-        <Navbar.Brand className="d-flex align-items-center gap-2 flex-shrink-0">
-          <Leaf size={24} />
-          <span className="d-none d-sm-inline">Hydroponics</span>
-        </Navbar.Brand>
+    <>
+      <Navbar
+        style={{ backgroundColor: "#43a459" }}
+        variant="dark"
+        expand="lg"
+        fixed="top"
+        className="shadow"
+      >
+        <Container fluid className="px-4 position-relative d-flex align-items-center">
+          <Navbar.Brand className="d-flex align-items-center gap-2 flex-shrink-0">
+            <Leaf size={24} />
+            <span className="d-none d-sm-inline">Hydroponics</span>
+          </Navbar.Brand>
 
-        <div
-          className="position-absolute start-50 translate-middle-x d-flex align-items-center gap-2 text-light"
-          style={{ whiteSpace: "nowrap" }}
-        >
-          <span
-            style={{
-              width: "12px",
-              height: "12px",
-              backgroundColor: "#3fe355",
-              borderRadius: "50%",
-              display: "inline-block",
-              animation: "pulse 2s infinite",
-            }}
-          />
-          <span>System: Running</span>
-        </div>
-
-        <div className="d-flex align-items-center gap-4 ms-auto text-light flex-nowrap">
-          <div className="d-none d-md-block">{currentDate} | {currentTime}</div>
-
-          <Button
-            variant="outline-light"
-            onClick={handleAdminClick}
-            className="d-flex align-items-center justify-content-center flex-shrink-0"
-            style={{
-              width: "50px",
-              height: "50px",
-              padding: 0,
-              borderRadius: "50%",
-            }}
+          <div
+            className="position-absolute start-50 translate-middle-x d-flex align-items-center gap-2 text-light"
+            style={{ whiteSpace: "nowrap" }}
           >
-            <User size={24} />
-          </Button>
-        </div>
+            <span
+              style={{
+                width: "12px",
+                height: "12px",
+                backgroundColor: "#3fe355",
+                borderRadius: "50%",
+                display: "inline-block",
+                animation: "pulse 2s infinite",
+              }}
+            />
+            <span>System: Running</span>
+          </div>
 
-        <style>
-          {`
-            @keyframes pulse {
-              0% { opacity: 1; }
-              50% { opacity: 0.5; }
-              100% { opacity: 1; }
-            }
+          <div className="d-flex align-items-center gap-2 ms-auto text-light flex-nowrap">
+            <div className="d-none d-md-block me-3">{currentDate} | {currentTime}</div>
 
-           /
-            @media (max-width: 576px) {
-              .navbar-brand span {
-                display: none;
+            <Button
+              variant="outline-light"
+              onClick={handleAdminClick}
+              className="d-flex align-items-center justify-content-center flex-shrink-0 border-0"
+              style={{
+                width: "40px",
+                height: "40px",
+                padding: 0,
+                borderRadius: "50%",
+                backgroundColor: 'rgba(255,255,255,0.1)'
+              }}
+              title="Admin Profile"
+            >
+              <User size={20} />
+            </Button>
+
+            <Button
+              variant="outline-light"
+              onClick={handleLogoutClick}
+              className="d-flex align-items-center gap-2 flex-shrink-0 ms-2"
+              size="sm"
+              style={{ borderRadius: "20px" }}
+            >
+              <LogOut size={16} />
+              <span className="d-none d-md-inline">Logout</span>
+            </Button>
+          </div>
+
+          <style>
+            {`
+              @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.5; }
+                100% { opacity: 1; }
               }
-            }
-          `}
-        </style>
-      </Container>
-    </Navbar>
+
+              @media (max-width: 576px) {
+                .navbar-brand span {
+                  display: none;
+                }
+              }
+            `}
+          </style>
+        </Container>
+      </Navbar>
+
+      {/* Logout Confirmation Modal */}
+      <Modal show={showLogoutConfirm} onHide={() => setShowLogoutConfirm(false)} centered>
+        <Modal.Header closeButton className="border-0 pb-0">
+        </Modal.Header>
+        <Modal.Body className="text-center pt-0 pb-4">
+          <div className="mb-3 text-warning">
+            <AlertTriangle size={48} />
+          </div>
+          <h4 className="fw-bold mb-2">Confirm Logout</h4>
+          <p className="text-muted mb-4">Are you sure you want to log out?</p>
+          <div className="d-flex justify-content-center gap-3">
+            <Button
+              variant="light"
+              onClick={() => setShowLogoutConfirm(false)}
+              className="px-4 rounded-pill"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={confirmLogout}
+              className="px-4 rounded-pill"
+            >
+              Yes, Logout
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 };
 
