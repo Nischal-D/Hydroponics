@@ -1,32 +1,45 @@
-import React, { useState } from 'react';
-import AppNavbar from "../src/components/Navbar";
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import AppNavbar from "./components/Navbar";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import PlantSetup from "./pages/PlantSetup";
 
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
+  const handleLogin = () => setIsLoggedIn(true);
+  const handleLogout = () => setIsLoggedIn(false);
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-  };
-
+  // 🔒 If not logged in → only Login page
   if (!isLoggedIn) {
     return <Login onLogin={handleLogin} />;
   }
 
   return (
-    <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-      <AppNavbar onLogout={handleLogout} />
-      <div style={{ marginTop: '80px' }}> {/* Add margin for fixed navbar */}
-        <Dashboard />
+    <BrowserRouter>
+      <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+        <AppNavbar onLogout={handleLogout} />
+
+         <div
+      style={{
+        backgroundColor: "#f8f9fa",
+        minHeight: "100vh",
+        paddingTop: "64px"
+      }}>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/plant-setup" element={<PlantSetup />} />
+
+            {/* Catch-all */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </BrowserRouter>
   );
 }
 
