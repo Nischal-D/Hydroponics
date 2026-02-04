@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Container, Navbar, Button, Modal } from "react-bootstrap";
 import { Leaf, User, LogOut, AlertTriangle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const AppNavbar = ({ onLogout }) => {
+  const navigate = useNavigate();
+
   const [currentDate, setCurrentDate] = useState("");
   const [currentTime, setCurrentTime] = useState("");
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -32,8 +34,9 @@ const AppNavbar = ({ onLogout }) => {
     return () => clearInterval(interval);
   }, []);
 
+
   const handleAdminClick = () => {
-    alert("Admin button clicked! You can open a dropdown or navigate here.");
+    navigate("/plant-setup");
   };
 
   const handleLogoutClick = () => {
@@ -48,66 +51,78 @@ const AppNavbar = ({ onLogout }) => {
   return (
     <>
       <Navbar
-        style={{ backgroundColor: "#43a459" }}
-        variant="dark"
-        expand="lg"
         fixed="top"
+        expand="lg"
+        variant="dark"
         className="shadow"
+        style={{ backgroundColor: "#43a459" }}
       >
         <Container fluid className="px-4 position-relative d-flex align-items-center">
-          <Navbar.Brand className="d-flex align-items-center gap-2 flex-shrink-0">
+          
+          {/* Brand */}
+          <Navbar.Brand
+            className="d-flex align-items-center gap-2 flex-shrink-0"
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          >
             <Leaf size={24} />
             <span className="d-none d-sm-inline">Hydroponics</span>
           </Navbar.Brand>
 
+          {/* System Status */}
           <div
             className="position-absolute start-50 translate-middle-x d-flex align-items-center gap-2 text-light"
             style={{ whiteSpace: "nowrap" }}
           >
             <span
               style={{
-                width: "12px",
-                height: "12px",
+                width: 12,
+                height: 12,
                 backgroundColor: "#3fe355",
                 borderRadius: "50%",
-                display: "inline-block",
                 animation: "pulse 2s infinite",
               }}
             />
             <span>System: Running</span>
           </div>
 
-          <div className="d-flex align-items-center gap-2 ms-auto text-light flex-nowrap">
-            <div className="d-none d-md-block me-3">{currentDate} | {currentTime}</div>
+          {/* Right Controls */}
+          <div className="d-flex align-items-center gap-3 ms-auto text-light flex-nowrap">
+            
+            <div className="d-none d-md-block me-3">
+              {currentDate} | {currentTime}
+            </div>
 
+            {/* Admin / Plant Setup */}
             <Button
               variant="outline-light"
               onClick={handleAdminClick}
-              className="d-flex align-items-center justify-content-center flex-shrink-0 border-0"
+              title="Plant Setup"
+              className="d-flex align-items-center justify-content-center border-0"
               style={{
-                width: "40px",
-                height: "40px",
-                padding: 0,
+                width: 40,
+                height: 40,
                 borderRadius: "50%",
-                backgroundColor: 'rgba(255,255,255,0.1)'
+                backgroundColor: "rgba(255,255,255,0.1)",
               }}
-              title="Admin Profile"
             >
               <User size={20} />
             </Button>
 
+            {/* Logout */}
             <Button
               variant="outline-light"
-              onClick={handleLogoutClick}
-              className="d-flex align-items-center gap-2 flex-shrink-0 ms-2"
               size="sm"
-              style={{ borderRadius: "20px" }}
+              onClick={handleLogoutClick}
+              className="d-flex align-items-center gap-2 ms-2"
+              style={{ borderRadius: 20 }}
             >
               <LogOut size={16} />
               <span className="d-none d-md-inline">Logout</span>
             </Button>
           </div>
 
+          {/* Animations */}
           <style>
             {`
               @keyframes pulse {
@@ -115,27 +130,28 @@ const AppNavbar = ({ onLogout }) => {
                 50% { opacity: 0.5; }
                 100% { opacity: 1; }
               }
-
-              @media (max-width: 576px) {
-                .navbar-brand span {
-                  display: none;
-                }
-              }
             `}
           </style>
         </Container>
       </Navbar>
 
       {/* Logout Confirmation Modal */}
-      <Modal show={showLogoutConfirm} onHide={() => setShowLogoutConfirm(false)} centered>
-        <Modal.Header closeButton className="border-0 pb-0">
-        </Modal.Header>
+      <Modal
+        show={showLogoutConfirm}
+        onHide={() => setShowLogoutConfirm(false)}
+        centered
+      >
+        <Modal.Header closeButton className="border-0 pb-0" />
         <Modal.Body className="text-center pt-0 pb-4">
           <div className="mb-3 text-warning">
             <AlertTriangle size={48} />
           </div>
+
           <h4 className="fw-bold mb-2">Confirm Logout</h4>
-          <p className="text-muted mb-4">Are you sure you want to log out?</p>
+          <p className="text-muted mb-4">
+            Are you sure you want to log out?
+          </p>
+
           <div className="d-flex justify-content-center gap-3">
             <Button
               variant="light"

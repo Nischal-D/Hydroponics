@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Spinner, Alert } from "react-bootstrap";
+import { Card, Table, Spinner, Alert, Badge } from "react-bootstrap";
 import API from "../services/api";
 
 const DataLogsTable = () => {
@@ -13,11 +13,7 @@ const DataLogsTable = () => {
         setLoading(true);
         const res = await API.get("sensors/");
         const sensorsArray = Array.isArray(res.data) ? res.data : res.data.data;
-        if (sensorsArray && sensorsArray.length > 0) {
-          setLogs(sensorsArray.slice(0, 10)); // latest 10 logs
-        } else {
-          setLogs([]);
-        }
+        setLogs(sensorsArray?.slice(0, 10) || []);
         setError(null);
       } catch (err) {
         console.error("Failed to fetch sensor logs", err);
@@ -28,33 +24,66 @@ const DataLogsTable = () => {
     };
 
     fetchLogs();
-    const interval = setInterval(fetchLogs, 5000); // refresh every 5s
+    const interval = setInterval(fetchLogs, 600000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <Card className="p-4 mb-4 shadow-sm" style={{ borderRadius: "16px" }}>
-      <Card.Body>
-        <Card.Title className="mb-4">Data Logs</Card.Title>
+    <Card
+      className="mb-4 shadow-sm border-0"
+      style={{ borderRadius: 16 }}
+    >
+      <Card.Body className="p-4">
+        {/* Header */}
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h5 className="mb-1 fw-semibold">Sensor Data Logs</h5>
+            <small className="text-muted">
+              Latest sensor readings (last 10 entries)
+            </small>
+          </div>
+          <Badge bg="success" pill>
+            Live
+          </Badge>
+        </div>
 
+        {/* Loading */}
         {loading && (
-          <div className="text-center">
-            <Spinner animation="border" size="sm" /> Loading logs...
+          <div className="text-center py-5 text-muted">
+            <Spinner animation="border" size="sm" className="me-2" />
+            Loading sensor logs…
           </div>
         )}
 
-        {error && <Alert variant="danger">{error}</Alert>}
+        {/* Error */}
+        {error && (
+          <Alert variant="danger" className="mt-3 mb-0">
+            {error}
+          </Alert>
+        )}
 
-        {!loading && logs.length === 0 && <p className="text-center">No data logs available</p>}
+        {/* Empty */}
+        {!loading && logs.length === 0 && !error && (
+          <div className="text-center py-5 text-muted">
+            No sensor data available
+          </div>
+        )}
 
-        {logs.length > 0 && (
-          <div className="table-responsive">
-            <Table striped bordered hover size="sm">
-              <thead className="table-light">
+        {/* Table */}
+        {logs.length > 0 && !loading && (
+          <div className="table-responsive mt-3">
+            <Table
+              hover
+              size="xs"
+              className="align-middle mb-0 table-bordered"
+              style={{ borderColor: "#e5e7eb" }}
+            >
+
+              <thead className="text-muted small">
                 <tr>
-                  <th>Time</th>
+                  <th className="text-center">Time</th>
                   <th className="text-center">pH</th>
-                  <th className="text-center">EC</th>
+                  <th className="text-center">EC / TDS</th>
                   <th className="text-center">Temp</th>
                   <th className="text-center">Humidity</th>
                 </tr>
@@ -62,16 +91,42 @@ const DataLogsTable = () => {
               <tbody>
                 {logs.map((log, index) => (
                   <tr key={index}>
-                    <td>
+                    <td className="fw-medium text-center">
                       {new Date(log.timestamp).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
                     </td>
-                    <td className="text-center">{log.ph?.toFixed(1) ?? "N/A"}</td>
-                    <td className="text-center">{log.tds?.toFixed(1) ?? "N/A"}</td>
-                    <td className="text-center">{log.temperature ?? "N/A"}°C</td>
-                    <td className="text-center">{log.humidity ?? "N/A"}%</td>
+
+                    <td className="text-center">
+                      {log.ph != null ? log.ph.toFixed(1) : "—"}
+                    </td>
+
+                    <td className="text-center">
+                      {log.tds != null ? log.tds.toFixed(1) : "—"}
+                    </td>
+
+                    <td className="text-center">
+                      {log.temperature != null ? (
+                        <>
+                          {log.temperature}
+                          <span className="text-muted small"> °C</span>
+                        </>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+
+                    <td className="text-center">
+                      {log.humidity != null ? (
+                        <>
+                          {log.humidity}
+                          <span className="text-muted small"> %</span>
+                        </>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
