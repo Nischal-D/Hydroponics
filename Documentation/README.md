@@ -12,15 +12,6 @@ This repository is a LaTeX template for **major/minor project** proposal, progre
 
 ## Build (Local)
 
-pdflatex main.tex      # 1st pass
-bibtex main            # if using bibliography
-makeglossaries main    # build glossaries
-pdflatex main.tex      # 2nd pass (cross-references)
-pdflatex main.tex      # 3rd pass (final)
-
-
-
-
 ### Requirements
 - A LaTeX distribution: **MiKTeX** (Windows) or **TeX Live** (Linux/macOS)
 - Recommended: `latexmk` (usually included with the distribution)
@@ -29,6 +20,14 @@ pdflatex main.tex      # 3rd pass (final)
 From the project root:
 - Clean: `latexmk -C main.tex`
 - Build PDF: `latexmk -pdf main.tex`
+- you can run these at once 
+    ```bash
+    pdflatex main.tex
+    bibtex main
+    makeglossaries main
+    pdflatex main.tex 
+    pdflatex main.tex
+    ```
 
 Tip: If you build into the `build/` folder, use `latexmk -pdf -outdir=build main.tex`.
 
