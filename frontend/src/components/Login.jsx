@@ -1,50 +1,55 @@
 import React, { useState } from 'react';
 import { Container, Card, Form, Button, Modal } from 'react-bootstrap';
-import { Leaf, Lock, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Leaf, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { login } from '../api/axios';
 
 const Login = ({ onLogin }) => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const validateEmail = (email) => {
-        return String(email)
-            .toLowerCase()
-            .match(
-                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-            );
-    };
-
     const handleErrorClose = () => {
         setShowErrorModal(false);
         setError('');
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
-        if (!validateEmail(email)) {
-            setError('Please enter a valid email address');
+        if (!username.trim()) {
+            setError('Please enter your username');
             setShowErrorModal(true);
             return;
         }
 
         setIsLoading(true);
 
-        // Simulate network delay for better UX
-        setTimeout(() => {
-            if (email === 'test1@gmail.com' && password === 'test123') {
-                onLogin();
+        try {
+            // Call API login
+            await login(username, password);
+            onLogin(); // Update parent state on success
+        } catch (err) {
+            console.error("Login Error:", err);
+            // Determine error message
+            if (err.response) {
+                if (err.response.status === 401) {
+                    setError('Invalid username or password');
+                } else {
+                    setError('Server error. Please try again later.');
+                }
+            } else if (err.request) {
+                setError('No response from server. Check your internet connection.');
             } else {
-                setError('Invalid email or password');
-                setShowErrorModal(true);
-                setIsLoading(false);
+                setError('An unexpected error occurred.');
             }
-        }, 800);
+            setShowErrorModal(true);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -72,16 +77,16 @@ const Login = ({ onLogin }) => {
                     <Card.Body className="p-5">
                         <Form onSubmit={handleSubmit}>
                             <Form.Group className="mb-4">
-                                <Form.Label className="text-muted small fw-bold text-uppercase">Email Address</Form.Label>
+                                <Form.Label className="text-muted small fw-bold text-uppercase">Username</Form.Label>
                                 <div className="input-group">
                                     <span className="input-group-text border-end-0 bg-white ps-3">
-                                        <Mail size={18} className="text-muted" />
+                                        <User size={18} className="text-muted" />
                                     </span>
                                     <Form.Control
-                                        type="email"
-                                        placeholder="Enter your email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        type="text"
+                                        placeholder="Enter your username"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
                                         required
                                         className="border-start-0 py-2 shadow-none"
                                         style={{ borderLeft: 'none' }}
