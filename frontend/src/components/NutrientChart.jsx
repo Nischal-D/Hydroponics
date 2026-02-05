@@ -1,72 +1,141 @@
-import React from 'react';
-import { Spinner } from 'react-bootstrap';
+import React, { useState } from "react";
+import { Spinner } from "react-bootstrap";
 
-const NutrientChart = ({ title, currentValue, status, color, timeRange = '1hour', loading = false }) => {
-  const displayValue = currentValue ?? 'N/A';
-  const displayStatus = status ?? 'N/A';
+const NutrientChart = ({
+  title,
+  currentValue,
+  status,
+  color,
+  timeRange = "1hour",
+  loading = false,
+  data = [],
+}) => {
+  const [tooltip, setTooltip] = useState(null); // {x, y, label} or null
+
+  const displayValue = currentValue ?? "N/A";
+  const displayStatus = status ?? "N/A";
   const chartHeight = 120;
+  const chartWidth = 600;
 
-  const getTimeLabels = () => {
-    switch (timeRange) {
-      case '1hour': return ['11:00', '11:10', '11:20', '11:30', '11:40', '11:45'];
-      case '24hours': return ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'];
-      case '1week': return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      default: return ['11:00', '11:10', '11:20', '11:30', '11:40', '11:45'];
-    }
-  };
+  const chartData = data.slice(-6);
 
+  const minValue = Math.min(...chartData);
+  const maxValue = Math.max(...chartData);
+  const range = maxValue - minValue || 1;
+
+  // Chart path
   const getChartPath = () => {
-    if (loading || currentValue == null) return `M0,${chartHeight} L600,${chartHeight}`;
-    switch (timeRange) {
-      case '1hour':
-        return `M 0,${chartHeight - 20} Q 25,${chartHeight - 30} 50,${chartHeight - 25} T 100,${chartHeight - 35} Q 150,${chartHeight - 32} 200,${chartHeight - 40} T 300,${chartHeight - 38} Q 350,${chartHeight - 42} 400,${chartHeight - 35} T 500,${chartHeight - 30} Q 550,${chartHeight - 35} 600,${chartHeight - 32}`;
-      case '24hours':
-        return `M 0,${chartHeight - 25} Q 50,${chartHeight - 35} 100,${chartHeight - 30} T 200,${chartHeight - 40} Q 250,${chartHeight - 38} 300,${chartHeight - 35} T 400,${chartHeight - 32} Q 500,${chartHeight - 28} 600,${chartHeight - 30}`;
-      case '1week':
-        return `M 0,${chartHeight - 30} Q 50,${chartHeight - 40} 100,${chartHeight - 35} T 200,${chartHeight - 45} Q 300,${chartHeight - 42} 400,${chartHeight - 38} T 600,${chartHeight - 35}`;
-      default:
-        return `M0,${chartHeight} L600,${chartHeight}`;
-    }
+    if (loading || chartData.length < 2) return `M0,${chartHeight} L${chartWidth},${chartHeight}`;
+    const stepX = chartWidth / (chartData.length - 1);
+
+    return chartData
+      .map((value, index) => {
+        const x = index * stepX;
+        const y = chartHeight - ((value - minValue) / range) * (chartHeight - 20) - 10;
+        return `${index === 0 ? "M" : "L"} ${x},${y}`;
+      })
+      .join(" ");
   };
 
-  const timeLabels = getTimeLabels();
   const chartPath = getChartPath();
 
-  return (
-    <div className="mb-3">
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <h6 className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>{title}</h6>
-        <span className="text-muted" style={{ fontSize: '0.75rem' }}>{loading ? 'Loading...' : displayStatus}</span>
-      </div>
+  // Y-axis labels step 10
+  const min = Math.floor(minValue / 10) * 10;
+  const max = Math.ceil(maxValue / 10) * 10;
+  const yLabels = [];
+  for (let val = min; val <= max; val += 10) yLabels.push(val);
 
+  const stepX = chartWidth / (chartData.length - 1);
+
+  return (
+    <div className="mb-3" style={{ position: "relative" }}>
+      {/* Title and Value */}
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <h6 className="text-muted mb-0" style={{ fontSize: "0.85rem" }}>{title}</h6>
+        <span className="text-muted" style={{ fontSize: "0.75rem" }}>{loading ? "Loading..." : displayStatus}</span>
+      </div>
       <div className="mb-2">
-        <span className="fw-bold" style={{ fontSize: '1.5rem', color: color }}>
+        <span className="fw-bold" style={{ fontSize: "1.5rem", color }}>
           {loading ? <Spinner animation="border" size="sm" /> : displayValue}
         </span>
       </div>
 
-      <div style={{ position: 'relative', height: `${chartHeight}px`, marginBottom: '10px' }}>
-        <svg width="100%" height={chartHeight} style={{ display: 'block' }}>
-          <line x1="0" y1={chartHeight / 2} x2="100%" y2={chartHeight / 2} stroke="#f0f0f0" strokeWidth="1" />
-          <line x1="0" y1={chartHeight} x2="100%" y2={chartHeight} stroke="#f0f0f0" strokeWidth="1" />
+      {/* Chart */}
+      <div style={{ position: "relative", height: `${chartHeight}px`, marginBottom: "10px" }}>
+        <svg width="100%" height={chartHeight + 20} style={{ display: "block" }}>
+          {/* Horizontal grid lines */}
+          {yLabels.map((val, i) => {
+            const y = chartHeight - ((val - minValue) / range) * (chartHeight - 20) - 10;
+            return (
+              <line key={i} x1={0} y1={y} x2={chartWidth} y2={y} stroke="#f0f0f0" strokeWidth="1" />
+            );
+          })}
 
-          <path d={`${chartPath} L600,${chartHeight} L0,${chartHeight} Z`} fill={`${color}20`} stroke="none" />
+          {/* Chart fill */}
+          <path d={`${chartPath} L${chartWidth},${chartHeight} L0,${chartHeight} Z`} fill={`${color}20`} stroke="none" />
+          {/* Chart line */}
           <path d={chartPath} fill="none" stroke={color} strokeWidth="2" />
+
+          {/* Y-axis labels */}
+          {yLabels.map((val, i) => {
+            const y = chartHeight - ((val - minValue) / range) * (chartHeight - 20) - 10 + 4;
+            return <text key={i} x={0} y={y} fontSize="10" fill="#999">{val}</text>;
+          })}
+
+          {/* X-axis label */}
+          <text x={chartWidth / 2} y={chartHeight + 15} fontSize="10" fill="#999" textAnchor="middle">
+            Past hour
+          </text>
+
+          {/* Hover points */}
+          {chartData.map((val, i) => {
+            const x = i * stepX;
+            const y = chartHeight - ((val - minValue) / range) * (chartHeight - 20) - 10;
+
+            return (
+              <circle
+                key={i}
+                cx={x}
+                cy={y}
+                r={4}
+                fill={color}
+                stroke="#fff"
+                strokeWidth={1}
+                onMouseEnter={() => setTooltip({ x, y, value: val, label: "Past hour" })}
+                onMouseLeave={() => setTooltip(null)}
+              />
+            );
+          })}
         </svg>
+
+        {/* Tooltip */}
+        {tooltip && (
+          <div
+            style={{
+              position: "absolute",
+              left: tooltip.x + 10,
+              top: tooltip.y - 30,
+              background: "#333",
+              color: "#fff",
+              padding: "4px 6px",
+              borderRadius: "4px",
+              fontSize: "0.75rem",
+              pointerEvents: "none",
+            }}
+          >
+            {tooltip.label}: {tooltip.value}
+          </div>
+        )}
       </div>
 
-      <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: '#999' }}>
-        {timeLabels.map((label, index) => (<span key={index}>{label}</span>))}
-      </div>
-
-      <div className="d-flex justify-content-between mt-2" style={{ fontSize: '0.7rem', color: '#999' }}>
+      {/* Bottom Info */}
+      <div className="d-flex justify-content-between mt-2" style={{ fontSize: "0.7rem", color: "#999" }}>
         <span>Low</span>
         <span>Time →</span>
-        <span>{loading ? 'N/A' : displayStatus}</span>
+        <span>{loading ? "N/A" : displayStatus}</span>
       </div>
     </div>
   );
 };
 
 export default NutrientChart;
-    

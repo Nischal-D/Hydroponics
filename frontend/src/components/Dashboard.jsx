@@ -3,8 +3,6 @@ import { Container, Row, Col, Card, Button, ButtonGroup } from "react-bootstrap"
 import { Droplets, Zap, Thermometer, Wind } from "lucide-react";
 import SensorCard from "./SensorCard";
 import NutrientChart from "./NutrientChart";
-import AlertItem from "./AlertItem";
-import AlertDetails from "./AlertDetails";
 import DataLogsTable from "./DataLogsTable";
 import API from "../services/api";
 
@@ -12,15 +10,7 @@ const Dashboard = () => {
   const [latestSensor, setLatestSensor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [timeRange, setTimeRange] = useState("1hour");
-  const [selectedAlert, setSelectedAlert] = useState(null);
-
-  const alerts = [
-    { id: 1, type: "warning", title: "High EC Level Detected", time: "11:30 AM" },
-    { id: 2, type: "warning", title: "Low pH Warning", time: "10:15 AM" },
-    { id: 3, type: "info", title: "Temperature Fluctuation", time: "09:45 AM" },
-  ];
 
   useEffect(() => {
     const fetchSensors = async () => {
@@ -28,15 +18,19 @@ const Dashboard = () => {
         setLoading(true);
         const res = await API.get("sensors/");
         const sensorsArray = Array.isArray(res.data) ? res.data : res.data.data;
+
         if (sensorsArray && sensorsArray.length > 0) {
           setLatestSensor(sensorsArray[0]);
         } else {
+          setSensorHistory([]);
           setLatestSensor(null);
+          setSensorHistory([]);
         }
         setError(null);
       } catch (err) {
         console.error("Failed to fetch sensor data", err);
         setError("Failed to load sensor data");
+        setSensorHistory([]);
         setLatestSensor(null);
       } finally {
         setLoading(false);
@@ -44,17 +38,21 @@ const Dashboard = () => {
     };
 
     fetchSensors();
-    const interval = setInterval(fetchSensors, 50000); // auto refresh
+    const interval = setInterval(fetchSensors, 50000); // refresh every 50s
     return () => clearInterval(interval);
   }, []);
 
+  // Sensor cards
   const sensorData = [
     {
       id: 1,
       title: "PH",
       value: latestSensor?.ph ?? "N/A",
       unit: "",
-      status: latestSensor ? (latestSensor.ph < 5.5 || latestSensor.ph > 6.5 ? "Unstable" : "Normal") : "N/A",
+      status:
+        latestSensor && (latestSensor.ph < 5.5 || latestSensor.ph > 6.5)
+          ? "Unstable"
+          : "Normal",
       color: "#2ecc71",
       icon: Droplets,
     },
@@ -100,13 +98,14 @@ const Dashboard = () => {
         ))}
       </Row>
 
-      {/* Nutrient Levels + Alerts */}
+      {/* Nutrient Levels */}
       <Row className="g-4 mb-4">
         <Col xs={12} lg={8}>
           <Card className="border-0 shadow-sm" style={{ borderRadius: "16px" }}>
             <Card.Body className="p-4">
               <h5 className="mb-4">Nutrient Levels Overview</h5>
 
+              {/* Time range buttons */}
               <ButtonGroup size="sm" className="mb-4">
                 <Button
                   variant={timeRange === "1hour" ? "success" : "outline-secondary"}
@@ -128,20 +127,26 @@ const Dashboard = () => {
                 </Button>
               </ButtonGroup>
 
+              {/* Charts */}
               <Row>
                 <Col md={6}>
                   <NutrientChart
                     title="pH Levels"
                     currentValue={latestSensor?.ph}
+                    data={sensorHistory}
+                    dataKey="ph"
                     status={latestSensor ? "Live" : "N/A"}
                     color="#3b82f6"
                     timeRange={timeRange}
                   />
                 </Col>
+
                 <Col md={6}>
                   <NutrientChart
                     title="EC Levels"
                     currentValue={latestSensor?.tds}
+                    data={sensorHistory}
+                    dataKey="tds"
                     status={latestSensor ? "Live" : "N/A"}
                     color="#10b981"
                     timeRange={timeRange}
@@ -150,26 +155,6 @@ const Dashboard = () => {
               </Row>
             </Card.Body>
           </Card>
-        </Col>
-
-        {/* Alerts */}
-        <Col xs={12} lg={4}>
-          {selectedAlert ? (
-            <AlertDetails alert={selectedAlert} onClose={() => setSelectedAlert(null)} />
-          ) : (
-            <Card className="border-0 shadow-sm" style={{ borderRadius: "16px" }}>
-              <Card.Body className="p-4">
-                <div className="d-flex justify-content-between mb-3">
-                  <h5>Alerts</h5>
-                  <span className="badge bg-danger">{alerts.length} Active</span>
-                </div>
-
-                {alerts.map((alert) => (
-                  <AlertItem key={alert.id} {...alert} onClick={() => setSelectedAlert(alert)} />
-                ))}
-              </Card.Body>
-            </Card>
-          )}
         </Col>
       </Row>
 
@@ -180,7 +165,6 @@ const Dashboard = () => {
         </Col>
       </Row>
     </Container>
-  );
+  );  
 };
-
 export default Dashboard;
