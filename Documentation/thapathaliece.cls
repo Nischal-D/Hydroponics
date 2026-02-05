@@ -189,8 +189,8 @@
 \setkomafont{chapterentry}{\normalfont\bfseries}
 \setkomafont{chapterentrydots}{\normalfont\bfseries}
 \KOMAoptions{chapterentrydots=true}
-\setcounter{tocdepth}{1}
-\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
 
 \sloppy % Justify text
 \hbadness=1000

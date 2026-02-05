@@ -13,3 +13,6 @@
 *.syi
 *.toc
 *.lot
+*.fdb_latexmk
+*.fls
+*.synctex.gz

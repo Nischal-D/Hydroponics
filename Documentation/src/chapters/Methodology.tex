@@ -1,26 +1,51 @@
 \chapter{METHODOLOGY}
 \section{System Overview}
-The automated hydroponic system is designed to maintain optimal nutrient solution chemistry and environmental conditions through continuous monitoring and closed-loop control. The system integrates high-accuracy sensors, an ESP32-based control unit, automated actuators, and cloud-based monitoring to regulate \gls{ph}, Total Dissolved Solids (\gls{tds}/Electrical Conductivity), and ambient humidity for hydroponic crop cultivation. The system is powered using a regular AC supply and provided with a battery backup in case of power outage.
+The automated hydroponic system is designed to maintain optimal nutrient solution chemistry and environmental conditions through continuous monitoring and closed-loop control. The system integrates high-accuracy sensors, an ESP32-based control unit, automated actuators, and cloud-based monitoring to regulate pH, Total Dissolved Solids (TDS/Electrical Conductivity), and ambient humidity for hydroponic crop cultivation. The system is powered using a regular AC supply and provided with a battery backup in case of power outage.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{src/images/blockDiagram.png}
-    \caption{Block Diagram}
+    \includegraphics[width=0.8\linewidth]{src/images/blockDiagram.png}
+    \caption{Block Diagram of the automated system}
     \label{fig: Block_Diagram}
 \end{figure}
 
 \section{Sensor Subsystem}
-The sensing subsystem is responsible for real-time acquisition of nutrient and environmental parameters:
-\begin{itemize}
-    \item \gls{ph} Measurement:\\
-     An pH circuit paired with a probe (range 0–14 \gls{ph}) continuously measures the acidity/alkalinity of the nutrient solution. The pH sensor having power rating of 0.5W has input voltage of 3.3-5.5V and working current of 5-10mA. Its output voltage is 0-2.3V and the measurement range is 0-14. It has an accuracy of ±0.1pH and resolution of 0.01pH.
-     \item TDS / Electrical Conductivity Measurement:\\
-     A TDS sensor measures nutrient concentration by converting electrical conductivity into ppm values. Temperature compensation is applied using ambient temperature data to improve accuracy. The TDS sensor has input voltage of 3.3-5.5V and working current of 3-6mA. Its output voltage is 0-2.3V  and the measurement range is 0-1000 ppm. It has an accuracy of ±2.5\% and resolution of 1ppm.
-     \item Humidity and Temperature Measurement:
-     A DHT22 digital sensor module provides precise relative humidity and temperature readings through a wire interface, enabling environmental regulation. The DHT22 sensor has input voltage of 3.3-6V and working current of 1.5-2.5mA. It gives digital output. It has an accuracy of ±0.5\% and resolution of 0.1 degree for temperature and accuracy 2-5\% \gls{rh} and resolution of 0.1\% \gls{rh} for humidity.    
-\end{itemize}
+The sensing subsystem is responsible for real-time data acquisition of nutrient and environmental parameters, using integrated sensor modules that simplify signal conditioning and communication with the microcontroller.
+\subsection{pH Sensor Module}
+The pH sensor module continuously monitors the acidity or alkalinity of the nutrient solution over a range of 0–14 pH. The module integrates a pH probe with an onboard signal conditioning circuit, providing a voltage output proportional to the pH level. It operates with an input voltage of 3.3–5.5V, consuming 5–10 mA of current, and outputs a voltage in the range of 0–2.3V corresponding to 0–14 pH. The module has an accuracy of ±0.1 pH and a resolution of 0.01 pH, making it suitable for precise nutrient management in hydroponic systems.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{src/images/pH.jpg}
+    \caption{pH Sensor}
+    \label{fig: pH_Sensor}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{src/images/pHDriver.jpg}
+    \caption{pH Driver}
+    \label{fig: pH_Driver}
+\end{figure}
+
+\subsection{TDS Sensor Module:}
+ The TDS sensor module measures nutrient concentration by converting the electrical conductivity (EC) of the solution into ppm values. It includes temperature compensation circuitry to improve measurement accuracy based on ambient temperature readings. The module operates at 3.3–5.5V, drawing 3–6 mA of current, and provides an analog voltage output of 0–2.3V corresponding to 0–1000 ppm. The sensor module offers an accuracy of ±2.5\% and a resolution of 1 ppm, allowing precise monitoring of nutrient levels in the hydroponic solution.
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{src/images/TDS.jpg}
+    \caption{TDS Sensor}
+    \label{fig: TDS_Sensor}
+\end{figure}
+
+\subsection{DHT22 Humidity and Temperature Sensor Module}
+The DHT22 module provides digital measurements of both relative humidity and temperature. It features a built-in sensor and signal processing circuit, delivering calibrated readings directly to the microcontroller over a single-wire digital interface. The module operates at 3.3–6V with a working current of 1.5–2.5 mA. It measures temperature with an accuracy of ±0.5°C and a resolution of 0.1°C, and humidity with an accuracy of 2–5\% RH and a resolution of 0.1\% RH. The DHT22 module enables precise monitoring and regulation of environmental conditions critical for optimal plant growth.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{src/images/dht22.jpg}
+    \caption{DHT22 Sensor}
+    \label{fig: DHT22_Sensor}
+\end{figure}
+
 
 \section{Control and Processing Unit}
-An \gls{esp}32-WROOM-32 microcontroller acts as the central controller. Its operating voltage is 3.3V and the maximum current it can handle is 40mA. Its responsibilities include:
+An ESP32-WROOM-32 microcontroller acts as the central controller. Its operating voltage is 3.3V and the maximum current it can handle is 40mA. Its responsibilities include:
 \begin{itemize}
     \item Processing sensor data via ADC and I$^2$C interfaces
     \item Executing closed-loop control algorithms
@@ -29,7 +54,7 @@ An \gls{esp}32-WROOM-32 microcontroller acts as the central controller. Its oper
 Crop-specific setpoints are stored in memory and can be updated remotely.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.04\linewidth]{src/images/ESP32.png}
+    \includegraphics[width=1\linewidth]{src/images/esp32.png}
     \caption{ESP32 pinout diagram}
     \label{fig:ESP32}
 \end{figure}
@@ -61,73 +86,72 @@ Crop-specific setpoints are stored in memory and can be updated remotely.
 \end{itemize}
 
 \section{Other Hardware Components}
-\subsection{Relay Module}
-A relay module is an electrically operated switch that allows low-voltage control signals from the microcontroller to switch high-voltage devices safely. It is used to control the operation of water pumps.
-
-\begin{itemize}
-\item Input Voltage: 5V DC  
-\item Output Voltage: Up to 220V AC / 30V DC  
-\item Current Rating: 10A
-\end{itemize}
+\subsection{IRL2203N MOSFET}
+The IRL2203N MOSFET acts as an electronically controlled switch, allowing low-voltage signals from the microcontroller to safely control high-voltage devices. In this system, it is employed to manage the operation of dosing pumps and exhaust fan, providing precise and reliable switching without the mechanical wear associated with relays. The MOSFET can handle high currents while being driven by the 3.3V logic output from the ESP32 microcontroller, making it suitable for both AC and DC loads.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\linewidth]{src/images/mosfet.png}
+    \caption{IRL2203N MOSFET}
+    \label{fig: IRL2203N_MOSFET}
+\end{figure}
 
 \subsection{Submersible Pump}
-The submersible pump is used to circulate water from the reservoir to the plant growing channels. It operates fully immersed in water and ensures continuous water flow.
-\begin{itemize}
-\item Input Voltage: 220–240V AC 
-\item Current Rating: 100 - 120 mA   
-\item Power Rating: 25W
-\end{itemize}
+The submersible pump is used to circulate water from the reservoir to the plant-growing channels. It operates fully immersed in water, ensuring continuous water flow and proper nutrient distribution. This pump functions on 220–240V AC with a current rating of 100–120 mA and a power consumption of 25W, providing sufficient flow for the hydroponic system.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\linewidth]{src/images/submersiblePump.png}
+    \caption{Submersible Pump}
+    \label{fig: Submersible_Pump}
+\end{figure}
 
 \subsection{5V DC Pump}
-The 5V DC pump is employed for controlled liquid transfer in small-volume applications such as nutrient dosing and pH balancer.
-\begin{itemize}
-\item Input Voltage: 5V DC 
-\item Current Rating: 130 - 220 mA  
-\item Power Rating: 2.5W
-\end{itemize}
+For smaller, controlled transfer of liquid such as nutrient dosing or pH adjustment, a 5V DC pump is utilized. It operates with an input voltage of 5V DC, drawing between 130–220 mA and consuming 2.5W of power. This pump allows precise dosing, which is crucial for maintaining optimal growing conditions.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\linewidth]{src/images/dcPump.png}
+    \caption{5V DC Pump}
+    \label{fig: 5V_DC_Pump}
+\end{figure}
 
-\subsection{Regulated AC Power Adapter (12V DC / 2A)}
-This adapter converts AC mains power into regulated 12V DC required for powering pumps and voltage regulation modules.
-\begin{itemize}
-\item Input Voltage: 220–240V AC  
-\item Output Voltage: 12V DC  
-\item Current Rating: 2A  
-\item Power Rating: 24W
-\end{itemize}
+\subsection{Regulated AC Power Adapter (12V DC / 1.5A)}
+A regulated AC power adapter is incorporated to convert mains AC voltage into a stable 12V DC output, required for powering pumps and voltage regulation modules. The adapter accepts an input of 220–240V AC and provides a 12V DC output with a maximum current of 1.5A, delivering up to 18W of power.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{src/images/adapter.png}
+    \caption{Regulated AC Power Adapter (12V DC / 1.5A)}
+    \label{fig: 12V_DC_Adapter}
+\end{figure}
 
 \subsection{3.3V to 5V Logic Level Shifter}
-The logic level shifter enables safe bidirectional voltage translation between 3.3V and 5V logic signals, allowing communication between the microcontroller and peripheral modules.
-\begin{itemize}
-\item Input Voltage: 3.3V / 5V \gls{dc}  
-\item Output Voltage: 5V / 3.3V DC  
-\item Current Rating: Up to 50 mA per channel  
-\item Power Rating: Less than 0.25W
-\end{itemize}
+The system also includes a 3.3V to 5V logic level shifter, which enables safe bidirectional voltage translation between the microcontroller’s 3.3V logic and peripheral modules operating at 5V. This shifter can handle up to 50 mA per channel while consuming less than 0.25W of power, ensuring reliable communication without risking damage to sensitive components.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\linewidth]{src/images/logicShifter.png}
+    \caption{3.3V to 5V Logic Level Shifter}
+    \label{fig: logicShifter}
+\end{figure}
 
 \subsection{LM2596 Buck Converter}
-The LM2596 is a step-down (buck) DC–DC converter used to efficiently reduce higher DC voltages to stable lower voltages required by sensors and control circuits.
-\begin{itemize}
-\item Input Voltage: 4–40V DC  
-\item Output Voltage: 1.25–35V DC (Adjustable)  
-\item Current Rating: Up to 3A  
-\item Power Rating: Up to 45W
-\end{itemize}
+To efficiently step down higher DC voltages to the lower levels required by sensors and control circuits, an LM2596 buck converter is used. It accepts an input voltage range of 4–40V DC and can provide an adjustable output between 1.25–35V DC, delivering up to 3A of current and up to 45W of power. This allows stable and efficient voltage regulation across the system.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\linewidth]{src/images/buckConverter.png}
+    \caption{LM2596 Buck Converter}
+    \label{fig: Buck_converter}
+\end{figure}
 
 \subsection{DC Fan}
-The DC Fan is used as an exhaust to the system.
-\begin{itemize}
-\item Input Voltage: 12V DC
-\item Current Rating: 0.8 A
-\item Power Rating: 9.6W
-\end{itemize}
+The system also employs a 12V DC fan as an exhaust mechanism to maintain proper ventilation and heat dissipation. The fan draws 0.8 A of current, consuming approximately 9.6W, ensuring that the electronics and pumps operate within safe temperature limits.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\linewidth]{src/images/dcFan.png}
+    \caption{12V DC Fan}
+    \label{fig: DC_Fan}
+\end{figure}
 
 \section{Safety, Reliability, and Fail-Safes}
-\begin{itemize}
-    \item Maximum pump runtime limits prevent overdosing.
-    \item Sensor fault detection halts the system and triggers alerts.
-    \item Battery backup ensures data integrity during power outages.
-    \item Antifouling measures and periodic probe cleaning enhance long-term reliability.
-\end{itemize}
+In terms of safety, reliability, and fail-safes, the system includes several protective measures. Maximum runtime limits for the pumps prevent overdosing of water or nutrients, while sensor fault detection automatically halts the system and triggers alerts to the operator. A battery backup ensures data integrity during power outages, and antifouling measures, combined with periodic cleaning of the probes, enhance the long-term reliability of the hydroponic setup.
+
 \section{Overall Working Principle}
 The system operates continuously in a closed-loop feedback manner, prioritizing EC control, followed by pH and humidity regulation. Automated calibration, safety mechanisms, and cloud-based monitoring ensure stable long-term operation, minimal human intervention, and optimal crop growth conditions.
 \subsection{Experimental Crop}
@@ -176,6 +200,6 @@ During the experimental period, readings from sensors, dosing events, and nutrie
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{src/images/Flowchart2.jpg}
-    \caption{Flowchart}
+    \caption{Flowchart of the ESP32 Firmware}
     \label{fig:Flowchart}
 \end{figure}

@@ -1,0 +1,17 @@
+\chapter{RESULT AND ANALYSIS}
+The Automated Nutrient Dosing and Monitoring System, at the current level of its development, manages to collect the data of pH, TDS, temperature, and humidity sensors and present it on a web-based dashboard. The sensors are linked to ESP32 microcontroller, which monitors real time environmental and nutrient variables of the hydroponic system. The ESP32 sends this sensor data to a cloud database via the Wi-Fi connection, where the readings are stored in a cloud database together with timestamps.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth,height=7cm]{src/images/logs.png}
+    \caption{Logs of sensor data uploaded by ESP32}
+    \label{fig: logs}
+\end{figure}
+
+The data is then stored and can be accessed and displayed on the site so that users can monitor pH, nutrient concentration, temperature and humidity. The dashboard presents both live values and graphical trends, confirming that sensor data acquisition, wireless communication, database storage, and frontend visualization are working correctly. These results demonstrate that the system is able to reliably sense, transmit, store, and display hydroponic parameters in real time.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{src/images/dashboard.png}
+    \caption{Dashboard with current data graphs}
+    \label{fig: dashboard}
+\end{figure}
+Error was observed on ESP pins GPIO4 (ADC1\_CH3) and GPIO2 (ADC2\_CH3) while reading analog data during testing where garbage values were observed possibly due to stray capacitances in the prototype board. GPIO2 and GPIO4 are also essential for boot functions i.e. LOW/HIGH at boot, and bootstrapping respectively. Whenever WiFi or Bluetooth is enabled, the aforementioned pins generally referred to as ADC2 pins are taken over by the RF subsystem and are regarded as unstable for analog readings, thus they return garbage values or fail. Therefore pins 32-36, 39 are more suited.
