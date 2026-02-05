@@ -1,44 +1,101 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Card, Form, Button, Badge } from "react-bootstrap";
 
+
 const PLANTS = {
   Lettuce: {
     ph: [5.5, 6.5],
-    tds: [560, 840], 
-    temperature: [15, 22],
+    tds: [560, 840],
+    // temperature: [15, 22],
     humidity: [50, 70],
+    ph_pmp_time:[5, 15],
+    ec_pmp_time:[10, 20],
+    rh_fan_time:[15, 25],
   },
-  Basil: {
-    ph: [5.5, 6.5],
-    tds: [700, 1000], 
-    temperature: [20, 28],
-    humidity: [40, 60],
-  },
-  Arugula: {
-    ph: [6.0, 6.5],
-    tds: [800, 1000], 
-    temperature: [16, 24],
-    humidity: [50, 70],
-  },
-  Microgreens: {
-    ph: [5.5, 6.5],
-    tds: [300, 800], 
-    temperature: [18, 24],
-    humidity: [40, 60],
-  }
+  // Basil: {
+  //   ph: [5.5, 6.5],
+  //   tds: [700, 1000],
+  //   temperature: [20, 28],
+  //   humidity: [40, 60],
+  // },
+  // Arugula: {
+  //   ph: [6.0, 6.5],
+  //   tds: [800, 1000],
+  //   temperature: [16, 24],
+  //   humidity: [50, 70],
+  // },
+  // Microgreens: {
+  //   ph: [5.5, 6.5],
+  //   tds: [300, 800],
+  //   temperature: [18, 24],
+  //   humidity: [40, 60],
+  // },
 };
-
 
 const FIELD_LABELS = {
   ph: "pH Level",
-  tds: "EC / TDS",
-  temperature: "Temperature (°C)",
+  tds: "EC / TDS (ppm)",
+  // temperature: "Temperature (°C)",
   humidity: "Humidity (%)",
+  ph_pmp_time : "pH Pump Time (ms)",
+  ec_pmp_time : "TDS Pump Time (ms)",
+  rh_fan_time : "RH Fan Time (ms)",
 };
+
+const API_BASE = "https://hydroponics-q549.onrender.com";
+
+
+async function refreshAccessToken() {
+  const refresh = localStorage.getItem("refresh");
+  if (!refresh) return null;
+
+  const res = await fetch(`${API_BASE}/api/token/refresh/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh }),
+  });
+
+  if (!res.ok) {
+    localStorage.clear();
+    return null;
+  }
+
+  const data = await res.json();
+  localStorage.setItem("access", data.access);
+  return data.access;
+}
+
+async function authFetch(url, options = {}) {
+  let access = localStorage.getItem("access");
+
+  let res = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${access}`,
+    },
+  });
+
+  if (res.status === 401) {
+    access = await refreshAccessToken();
+    if (!access) throw new Error("Session expired");
+
+    res = await fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        Authorization: `Bearer ${access}`,
+      },
+    });
+  }
+
+  return res;
+}
 
 const PlantSetup = () => {
   const [plant, setPlant] = useState("");
   const [params, setParams] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handlePlantChange = (e) => {
     const selected = e.target.value;
@@ -47,7 +104,7 @@ const PlantSetup = () => {
   };
 
   const handleChange = (field, index, value) => {
-    let num =
+    const num =
       field === "ph"
         ? Number(parseFloat(value).toFixed(1))
         : Number(value);
@@ -61,20 +118,48 @@ const PlantSetup = () => {
     });
   };
 
-  const handleSave = () => {
-    console.log("Plant:", plant);
-    console.log("Thresholds:", params);
-    alert("Plant configuration saved successfully!");
-    // later → POST to backend
+
+
+  const handleSave = async () => {
+    if (!params) return;
+
+    setLoading(true);
+
+    const payload = {
+      pH_threshold: params.ph[0] ,
+      ec_threshold: params.tds[0],      
+      rh_threshold: params.humidity[0],
+      pH_pmp_time: params.ph_pmp_time[0],
+      ec_pmp_time: params.ec_pmp_time[0],
+      rh_fan_time: params.rh_fan_time[0],
+    };
+
+    try {
+      const res = await authFetch(`${API_BASE}/control/`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+
+      alert("Plant configuration saved successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save configuration. Please login again.");
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   return (
     <Container fluid className="py-4 px-4">
-      {/* Header */}
       <Row className="mb-4 text-center">
         <Col>
           <h3 className="fw-bold">Plant Configuration</h3>
-          <p className="text-muted mb-2">
+          <p className="text-muted">
             Select a plant and configure ideal growing conditions
           </p>
           {plant && (
@@ -85,94 +170,62 @@ const PlantSetup = () => {
         </Col>
       </Row>
 
-      {/* Card */}
-      <Card
-        className="border-0 shadow-sm mx-auto"
-        style={{ borderRadius: "16px", maxWidth: "900px" }}
-      >
+      <Card className="border-0 shadow-sm mx-auto" style={{ maxWidth: 900 }}>
         <Card.Body className="p-4">
-          {/* Plant Select */}
           <Form.Group className="mb-4 text-center">
-            <Form.Label className="fw-semibold mb-2">
-              Choose Plant
-            </Form.Label>
+            <Form.Label className="fw-semibold">Choose Plant</Form.Label>
             <Form.Select
               value={plant}
               onChange={handlePlantChange}
-              className="mx-auto"
-              style={{ maxWidth: 320 }}
+              style={{ maxWidth: 320, margin: "0 auto" }}
             >
               <option value="">Select Plant</option>
               {Object.keys(PLANTS).map((p) => (
-                <option key={p} value={p}>{p}</option>
+                <option key={p} value={p}>
+                  {p}
+                </option>
               ))}
             </Form.Select>
           </Form.Group>
 
-          {/* Parameters */}
-          {params && (
-            <>
-              <Row className="mb-3 text-center">
-                <Col className="text-muted fw-semibold">
-                  Set Acceptable Parameter Ranges
+          {params &&
+            Object.keys(FIELD_LABELS).map((field) => (
+              <Row key={field} className="align-items-center mb-3">
+                <Col md={4} className="fw-semibold text-md-end text-center">
+                  {FIELD_LABELS[field]}
+                </Col>
+                <Col md={3}>
+                  <Form.Control
+                    type="number"
+                    step={field === "ph" ? 0.1 : 1}
+                    value={params[field][0]}
+                    onChange={(e) =>
+                      handleChange(field, 0, e.target.value)
+                    }
+                  />
+                </Col>
+                <Col md={3}>
+                  <Form.Control
+                    type="number"
+                    value={params[field][1]}
+                    disabled
+                    title="Optimal Value"
+                  />
                 </Col>
               </Row>
+            ))}
 
-              {Object.keys(FIELD_LABELS).map((field) => (
-                <Row
-                  key={field}
-                  className="align-items-center mb-3 px-md-3"
-                >
-                  <Col
-                    md={4}
-                    className="fw-semibold text-md-end text-center mb-2 mb-md-0"
-                  >
-                    {FIELD_LABELS[field]}
-                  </Col>
-
-                  <Col md={3}>
-                    <Form.Control
-                      type="number"
-                      step={field === "ph" ? 0.1 : 1}
-                      min={field === "temperature" ? undefined : 0}
-                      max={field === "ph" ? 14 : undefined}
-                      value={params[field][0]}
-                      onChange={(e) =>
-                        handleChange(field, 0, e.target.value)
-                      }
-                      placeholder="Min"
-                    />
-                  </Col>
-
-                  <Col md={3}>
-                    <Form.Control
-                      type="number"
-                      step={field === "ph" ? 0.1 : 1}
-                      min={field === "ph" ? 0 : undefined}
-                      max={field === "ph" ? 14 : field === "humidity" ? 100 : undefined}
-                      value={params[field][1]}
-                      onChange={(e) =>
-                        handleChange(field, 1, e.target.value)
-                      }
-                      placeholder="Max"
-                    />
-                  </Col>
-                </Row>
-              ))}
-
-              {/* Save */}
-              <div className="text-center mt-4">
-                <Button
-                  variant="success"
-                  size="lg"
-                  className="px-5"
-                  style={{ borderRadius: "30px" }}
-                  onClick={handleSave}
-                >
-                  Save Configuration
-                </Button>
-              </div>
-            </>
+          {params && (
+            <div className="text-center mt-4">
+              <Button
+                variant="success"
+                size="lg"
+                disabled={loading}
+                onClick={handleSave}
+              >
+                {loading ? "Saving..." : "Save Configuration"}
+              </Button>
+            </div>
           )}
         </Card.Body>
       </Card>
