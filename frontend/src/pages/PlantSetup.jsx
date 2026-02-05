@@ -6,34 +6,40 @@ const PLANTS = {
   Lettuce: {
     ph: [5.5, 6.5],
     tds: [560, 840],
-    temperature: [15, 22],
+    // temperature: [15, 22],
     humidity: [50, 70],
+    ph_pmp_time:[5, 15],
+    ec_pmp_time:[10, 20],
+    rh_fan_time:[15, 25],
   },
-  Basil: {
-    ph: [5.5, 6.5],
-    tds: [700, 1000],
-    temperature: [20, 28],
-    humidity: [40, 60],
-  },
-  Arugula: {
-    ph: [6.0, 6.5],
-    tds: [800, 1000],
-    temperature: [16, 24],
-    humidity: [50, 70],
-  },
-  Microgreens: {
-    ph: [5.5, 6.5],
-    tds: [300, 800],
-    temperature: [18, 24],
-    humidity: [40, 60],
-  },
+  // Basil: {
+  //   ph: [5.5, 6.5],
+  //   tds: [700, 1000],
+  //   temperature: [20, 28],
+  //   humidity: [40, 60],
+  // },
+  // Arugula: {
+  //   ph: [6.0, 6.5],
+  //   tds: [800, 1000],
+  //   temperature: [16, 24],
+  //   humidity: [50, 70],
+  // },
+  // Microgreens: {
+  //   ph: [5.5, 6.5],
+  //   tds: [300, 800],
+  //   temperature: [18, 24],
+  //   humidity: [40, 60],
+  // },
 };
 
 const FIELD_LABELS = {
   ph: "pH Level",
   tds: "EC / TDS (ppm)",
-  temperature: "Temperature (°C)",
+  // temperature: "Temperature (°C)",
   humidity: "Humidity (%)",
+  ph_pmp_time : "pH Pump Time (ms)",
+  ec_pmp_time : "TDS Pump Time (ms)",
+  rh_fan_time : "RH Fan Time (ms)",
 };
 
 const API_BASE = "https://hydroponics-q549.onrender.com";
@@ -121,13 +127,11 @@ const PlantSetup = () => {
 
     const payload = {
       pH_threshold: params.ph[0] ,
-      ec_threshold: params.tds[1],      
+      ec_threshold: params.tds[0],      
       rh_threshold: params.humidity[0],
-
-      // default actuator timings (seconds)
-      pH_pmp_time: 5,
-      ec_pmp_time: 10,
-      rh_fan_time: 15,
+      pH_pmp_time: params.ph_pmp_time[0],
+      ec_pmp_time: params.ec_pmp_time[0],
+      rh_fan_time: params.rh_fan_time[0],
     };
 
     try {
@@ -203,11 +207,9 @@ const PlantSetup = () => {
                 <Col md={3}>
                   <Form.Control
                     type="number"
-                    step={field === "ph" ? 0.1 : 1}
                     value={params[field][1]}
-                    onChange={(e) =>
-                      handleChange(field, 1, e.target.value)
-                    }
+                    disabled
+                    title="Optimal Value"
                   />
                 </Col>
               </Row>
