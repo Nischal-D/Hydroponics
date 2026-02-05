@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-    baseURL: 'http://localhost:8000/api/', // Adjust if your backend port is different
+    baseURL: 'https://hydroponics-q549.onrender.com/',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -39,7 +39,7 @@ api.interceptors.response.use(
                 }
 
                 // Call refresh endpoint
-                const response = await axios.post('http://localhost:8000/api/token/refresh/', {
+                const response = await axios.post('https://hydroponics-q549.onrender.com/api/token/refresh/', {
                     refresh: refreshToken,
                 });
 
@@ -66,7 +66,7 @@ api.interceptors.response.use(
 );
 
 export const login = async (username, password) => {
-    const response = await api.post('token/', { username, password });
+    const response = await api.post('api/token/', { username, password });
     if (response.data.access && response.data.refresh) {
         localStorage.setItem('access', response.data.access);
         localStorage.setItem('refresh', response.data.refresh);
