@@ -8,6 +8,7 @@ import API from "../services/api";
 
 const Dashboard = () => {
   const [latestSensor, setLatestSensor] = useState(null);
+  const [sensorHistory, setSensorHistory] = useState([]); // last 10 entries
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("1hour");
@@ -20,11 +21,13 @@ const Dashboard = () => {
         const sensorsArray = Array.isArray(res.data) ? res.data : res.data.data;
 
         if (sensorsArray && sensorsArray.length > 0) {
-          setLatestSensor(sensorsArray[0]);
+          // Take last 10 entries, oldest first
+          const lastTen = sensorsArray.slice(0, 10).reverse();
+          setSensorHistory(lastTen);
+          setLatestSensor(lastTen[lastTen.length - 1]);
         } else {
           setSensorHistory([]);
           setLatestSensor(null);
-          setSensorHistory([]);
         }
         setError(null);
       } catch (err) {
@@ -100,7 +103,7 @@ const Dashboard = () => {
 
       {/* Nutrient Levels */}
       <Row className="g-4 mb-4">
-        <Col xs={12} lg={8}>
+        <Col xs={12} lg={12}>
           <Card className="border-0 shadow-sm" style={{ borderRadius: "16px" }}>
             <Card.Body className="p-4">
               <h5 className="mb-4">Nutrient Levels Overview</h5>
@@ -133,11 +136,10 @@ const Dashboard = () => {
                   <NutrientChart
                     title="pH Levels"
                     currentValue={latestSensor?.ph}
-                    data={sensorHistory}
-                    dataKey="ph"
                     status={latestSensor ? "Live" : "N/A"}
                     color="#3b82f6"
                     timeRange={timeRange}
+                    data={sensorHistory.map((s) => Number(s.ph))}
                   />
                 </Col>
 
@@ -145,11 +147,10 @@ const Dashboard = () => {
                   <NutrientChart
                     title="EC Levels"
                     currentValue={latestSensor?.tds}
-                    data={sensorHistory}
-                    dataKey="tds"
                     status={latestSensor ? "Live" : "N/A"}
                     color="#10b981"
                     timeRange={timeRange}
+                    data={sensorHistory.map((s) => Number(s.tds))}
                   />
                 </Col>
               </Row>
@@ -165,6 +166,7 @@ const Dashboard = () => {
         </Col>
       </Row>
     </Container>
-  );  
+  );
 };
+
 export default Dashboard;
