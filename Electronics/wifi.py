@@ -25,28 +25,47 @@ def init_credentials():
 
 wlan = network.WLAN(network.STA_IF)
 
-def wifi_connect(WIFI_SSID, WIFI_PASSWORD):
+def isWifiConnected():
+    return wlan.isconnected()
+
+
+def wifi_connect(networks):
     if not wlan.active():
         wlan.active(True)
 
     if wlan.isconnected():
         return True
 
-    print("Connecting to WiFi", end="")
-    wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+    for net in networks:
+        ssid = net["ssid"]
+        password = net["password"]
 
-    timeout = 15
-    start = time()
-
-    while not wlan.isconnected():
-        if time() - start > timeout:
-            print("\nWiFi connect failed")
-            return False
-        print(".", end="")
+        print(f"\nTrying {ssid}", end="")
+        
+        wlan.disconnect()
         sleep_ms(500)
 
-    print("\nWiFi connected:", wlan.ifconfig()[0])
-    return True
+        wlan.connect(ssid, password)
+
+        timeout = 15
+        start = time()
+
+        while not wlan.isconnected():
+            if time() - start > timeout:
+                print("\nConnection timeout")
+                wlan.disconnect()
+                sleep_ms(1000)
+                break
+
+            print(".", end="")
+            sleep_ms(500)
+
+        if wlan.isconnected():
+            print(f"\nConnected to {ssid}: {wlan.ifconfig()[0]}")
+            return True
+
+    print("\nAll WiFi networks failed")
+    return False
 
 def upload_sensor_data(DEVICE_ID,INSERT_ENDPOINT,SUPABASE_ANON_KEY,ph=6.6, tds=840, temperature=25, humidity=80):
     from lib import urequests
@@ -130,3 +149,28 @@ def fetch_control_data(DEVICE_ID,SUPABASE_URL,SUPABASE_ANON_KEY):
         print("Fetch error:", e)
         return {'status_code':400, 'data' : "error"}
         #sleep_ms(3000)
+    
+    
+BUFFER_FILE = "buffer.txt"
+
+def save_offline(data):
+    # data is a dict
+    import ujson
+    with open(BUFFER_FILE, "a") as f:
+        f.write(ujson.dumps(data) + "\n")
+    print("Data saved offline")
+
+def flush_offline_data():
+    if BUFFER_FILE not in os.listdir():
+        return
+
+    print("Flushing offline data...")
+    with open(BUFFER_FILE, "r") as f:
+        for line in f:
+            d = ujson.loads(line)
+            upload_sensor_data(
+                d["ph"], d["tds"], d["temperature"], d["humidity"]
+            )
+
+    os.remove(BUFFER_FILE)
+    print("Offline buffer cleared")
