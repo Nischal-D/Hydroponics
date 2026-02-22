@@ -4,6 +4,7 @@ import ujson
 import gc
 from preferences import *
 from defaults import *
+import os
 
 CREDENTIAL_FILE = "credentials.json"
 
@@ -94,12 +95,15 @@ def upload_sensor_data(DEVICE_ID,INSERT_ENDPOINT,SUPABASE_ANON_KEY,ph=6.6, tds=8
             headers=headers,
             data=ujson.dumps(payload)
         )
-
+        
+        status_code = r.status_code
         print("Upload HTTP:", r.status_code)
         r.close()
         del r
+        return status_code
     except Exception as e:
         print("Upload error:", e)
+        return 400
         
 def fetch_control_data(DEVICE_ID,SUPABASE_URL,SUPABASE_ANON_KEY):
     from lib import urequests
@@ -160,17 +164,44 @@ def save_offline(data):
         f.write(ujson.dumps(data) + "\n")
     print("Data saved offline")
 
-def flush_offline_data():
+def flush_offline_data(credentials,INSERT_ENDPOINT):
     if BUFFER_FILE not in os.listdir():
         return
 
     print("Flushing offline data...")
-    with open(BUFFER_FILE, "r") as f:
-        for line in f:
-            d = ujson.loads(line)
-            upload_sensor_data(
-                d["ph"], d["tds"], d["temperature"], d["humidity"]
-            )
 
-    os.remove(BUFFER_FILE)
-    print("Offline buffer cleared")
+    remaining_lines = []
+
+    with open(BUFFER_FILE, "r") as f:
+        lines = f.readlines()
+
+    for index, line in enumerate(lines):
+        d = ujson.loads(line)
+
+        status_code = upload_sensor_data(
+            credentials["DEVICE_ID"],
+            INSERT_ENDPOINT,
+            credentials["SUPABASE_ANON_KEY"],
+            d["ph"],
+            d["tds"],
+            d["dht"][0],
+            d["dht"][1]
+        )
+
+        if status_code == 201:
+            # Skip this line (delete it)
+            continue
+        else:
+            # Keep failed and remaining lines
+            remaining_lines = lines[index:]
+            break
+
+    # Rewrite file with remaining lines
+    if remaining_lines:
+        with open(BUFFER_FILE, "w") as f:
+            f.writelines(remaining_lines)
+    else:
+        os.remove(BUFFER_FILE)
+        print("Offline buffer cleared")
+
+    print("Flush attempt completed")

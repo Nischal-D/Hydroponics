@@ -1,5 +1,7 @@
 import ujson
-import gc
+import gc    
+from machine import Pin
+from time import sleep_ms
 
 def save_json(filename, data):
     with open(filename, "w") as f:
@@ -12,5 +14,3 @@ def load_json(filename):
             return ujson.load(f)
     except:
         return None
-
-    
