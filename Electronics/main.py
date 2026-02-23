@@ -63,13 +63,13 @@ while True:
         data['ph'] = pins.read_ph_data()
     
     # ph comparision
-    if data['ph'] < settings['pH_threshold']:
+    if data['ph'] > settings['pH_threshold']:
         pins.pump2.on()
         sleep_ms(settings['pH_pmp_time'])
         pins.pump2.off()
         
     # rh comparision
-    if data['dht'][1] < settings['rh_threshold']:
+    if data['dht'][1] > settings['rh_threshold']:
         pins.fan.on()
         sleep_ms(settings['rh_fan_time'])
         pins.fan.off()
