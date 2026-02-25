@@ -13,7 +13,7 @@ const NutrientChart = ({ title, currentValue, status, color, data = [], dataKey,
       const value = payload[0].value;
       return (
         <div className="bg-white p-2 border border-secondary rounded shadow-sm" style={{ fontSize: '0.8rem' }}>
-          <p className="mb-0 fw-bold">{new Date(label).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+          <p className="mb-0 fw-bold">{new Date(label).toLocaleString([], { hour: '2-digit', minute: '2-digit' })}</p>
           <p className="mb-0" style={{ color: color }}>
             {typeof value === 'number' ? value.toFixed(2) : value}
           </p>

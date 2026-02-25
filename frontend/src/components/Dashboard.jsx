@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Button, ButtonGroup } from "react-bootstrap";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import { Droplets, Zap, Thermometer, Wind } from "lucide-react";
 import SensorCard from "./SensorCard";
 import NutrientChart from "./NutrientChart";
@@ -8,11 +8,9 @@ import API from "../services/api";
 
 const Dashboard = () => {
   const [latestSensor, setLatestSensor] = useState(null);
-  const [sensorHistory, setSensorHistory] = useState([]); // Store history
+  const [sensorHistory, setSensorHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-
 
   useEffect(() => {
     const fetchSensors = async () => {
@@ -22,16 +20,19 @@ const Dashboard = () => {
         const sensorsArray = Array.isArray(res.data) ? res.data : res.data.data;
 
         if (sensorsArray && sensorsArray.length > 0) {
-          setLatestSensor(sensorsArray[0]);
-          setSensorHistory(sensorsArray); // Store full history
+          // Take last entries, oldest first
+          const history = [...sensorsArray].reverse();
+          setSensorHistory(history);
+          setLatestSensor(history[history.length - 1]);
         } else {
-          setLatestSensor(null);
           setSensorHistory([]);
+          setLatestSensor(null);
         }
         setError(null);
       } catch (err) {
         console.error("Failed to fetch sensor data", err);
         setError("Failed to load sensor data");
+        setSensorHistory([]);
         setLatestSensor(null);
       } finally {
         setLoading(false);
@@ -39,17 +40,21 @@ const Dashboard = () => {
     };
 
     fetchSensors();
-    const interval = setInterval(fetchSensors, 50000); // auto refresh
+    const interval = setInterval(fetchSensors, 50000); // refresh every 50s
     return () => clearInterval(interval);
   }, []);
 
+  // Sensor cards
   const sensorData = [
     {
       id: 1,
       title: "PH",
       value: latestSensor?.ph ?? "N/A",
       unit: "",
-      status: latestSensor ? (latestSensor.ph < 5.5 || latestSensor.ph > 6.5 ? "Unstable" : "Normal") : "N/A",
+      status:
+        latestSensor && (latestSensor.ph < 5.5 || latestSensor.ph > 6.5)
+          ? "Unstable"
+          : "Normal",
       color: "#2ecc71",
       icon: Droplets,
     },
@@ -91,7 +96,7 @@ const Dashboard = () => {
     const filtered = data.filter(item => new Date(item.timestamp) >= cutoff);
 
     // Fallback: If no data in period, return the last 50 items
-    return filtered.length > 0 ? filtered : data.slice(0, 50);
+    return filtered.length > 0 ? filtered : data.slice(-50);
   };
 
   const sampleData = (data) => {
@@ -147,6 +152,7 @@ const Dashboard = () => {
                 <h5 className="mb-0">Nutrient Levels Overview (Past Hour)</h5>
               </div>
 
+              {/* Charts */}
               <Row>
                 <Col md={6}>
                   <NutrientChart
@@ -159,6 +165,7 @@ const Dashboard = () => {
                     loading={loading}
                   />
                 </Col>
+
                 <Col md={6}>
                   <NutrientChart
                     title="EC Levels"
@@ -185,4 +192,5 @@ const Dashboard = () => {
     </Container>
   );
 };
+
 export default Dashboard;

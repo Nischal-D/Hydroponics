@@ -1,3 +1,5 @@
 \chapter{REMAINING TASKS}
-
-to be added
+An enclosed structure will be implemented around the hydroponic system to reduce the influence of the external environment on humidity. Controlled ventilation using an exhaust fan will allow humidity to be regulated within crop-specific limits. This will provide a more stable growing environment and improve plant growth consistency.\\[10pt]
+The dosing logic will be finalized by calculating pump activation time based on the pump flow rate and the deviation from the target pH and EC values. A proportional dosing approach will be used to apply gradual corrections and avoid overdosing. Stabilization delays and safety limits will ensure reliable and stable control.\\[10pt]
+The data obtained from pH, EC, temperature, and humidity sensors will be logged continuously throughout the full lettuce growth cycle. These data will be stored in a cloud database for detailed analysis. The collected data will support performance evaluation, trend analysis, and provide a base for comparison with manual hydroponic systems.\\[10pt]
+The transmission of data was found unreliable over Wi-Fi as interference and pin conflicts were observed on certain GPIOs which were GPIO2, GPIO4, and GPIO15. Alternative GPIO pins will be evaluated and reassigned to ensure stable sensor readings. This adjustment is expected to improve data reliability and overall system performance.
