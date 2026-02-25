@@ -12,7 +12,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [timeRange, setTimeRange] = useState("1hour");
+
 
   useEffect(() => {
     const fetchSensors = async () => {
@@ -82,6 +82,49 @@ const Dashboard = () => {
     },
   ];
 
+  const filterData = (data) => {
+    if (!data || data.length === 0) return [];
+
+    const now = new Date();
+    const cutoff = new Date(now.getTime() - 60 * 60 * 1000); // Past 1 hour
+
+    const filtered = data.filter(item => new Date(item.timestamp) >= cutoff);
+
+    // Fallback: If no data in period, return the last 50 items
+    return filtered.length > 0 ? filtered : data.slice(0, 50);
+  };
+
+  const sampleData = (data) => {
+    if (!data || data.length === 0) return [];
+
+    const intervalMs = 2 * 60 * 1000; // 2 minute buckets for a 1-hour window
+
+    const groups = {};
+    data.forEach(item => {
+      const time = new Date(item.timestamp).getTime();
+      if (isNaN(time)) return; // Skip invalid dates
+      const bucket = Math.floor(time / intervalMs) * intervalMs;
+      if (!groups[bucket]) groups[bucket] = [];
+      groups[bucket].push(item);
+    });
+
+    return Object.keys(groups)
+      .sort((a, b) => parseInt(a) - parseInt(b))
+      .map(bucket => {
+        const group = groups[bucket];
+        const avgPh = group.reduce((acc, i) => acc + (parseFloat(i.ph) || 0), 0) / group.length;
+        const avgTds = group.reduce((acc, i) => acc + (parseFloat(i.tds) || 0), 0) / group.length;
+        return {
+          timestamp: new Date(parseInt(bucket)).toISOString(),
+          ph: Number(avgPh.toFixed(2)),
+          tds: Number(avgTds.toFixed(2)),
+        };
+      });
+  };
+
+  const filteredHistory = filterData(sensorHistory);
+  const sampledHistory = sampleData(filteredHistory);
+
   return (
     <Container fluid className="py-4 px-4">
       {error && <p className="text-center text-danger">{error}</p>}
@@ -100,35 +143,16 @@ const Dashboard = () => {
         <Col xs={12}>
           <Card className="border-0 shadow-sm" style={{ borderRadius: "16px" }}>
             <Card.Body className="p-4">
-              <h5 className="mb-4">Nutrient Levels Overview</h5>
-
-              <ButtonGroup size="sm" className="mb-4">
-                <Button
-                  variant={timeRange === "1hour" ? "success" : "outline-secondary"}
-                  onClick={() => setTimeRange("1hour")}
-                >
-                  1 Hour
-                </Button>
-                <Button
-                  variant={timeRange === "24hours" ? "success" : "outline-secondary"}
-                  onClick={() => setTimeRange("24hours")}
-                >
-                  24 Hours
-                </Button>
-                <Button
-                  variant={timeRange === "1week" ? "success" : "outline-secondary"}
-                  onClick={() => setTimeRange("1week")}
-                >
-                  1 Week
-                </Button>
-              </ButtonGroup>
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h5 className="mb-0">Nutrient Levels Overview (Past Hour)</h5>
+              </div>
 
               <Row>
                 <Col md={6}>
                   <NutrientChart
                     title="pH Levels"
                     currentValue={latestSensor?.ph}
-                    data={sensorHistory}
+                    data={sampledHistory}
                     dataKey="ph"
                     status={latestSensor ? "Live" : "N/A"}
                     color="#3b82f6"
@@ -139,7 +163,7 @@ const Dashboard = () => {
                   <NutrientChart
                     title="EC Levels"
                     currentValue={latestSensor?.tds}
-                    data={sensorHistory}
+                    data={sampledHistory}
                     dataKey="tds"
                     status={latestSensor ? "Live" : "N/A"}
                     color="#10b981"
