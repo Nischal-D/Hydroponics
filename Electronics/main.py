@@ -3,11 +3,14 @@ from consts import Pins
 from wifi import *
 from preferences import *
 from defaults import *
-from machine import ADC, Pin
+from machine import ADC, Pin, reset
+from utime import ticks_ms, ticks_diff
 
-READ_DELAY = 600
+READ_DELAY = 400000
 STABILIZATION_DELAY = 300
+RESTART_DELAY = 3600000
 
+sleep(2)
 pins = Pins()
 
 credentials = init_credentials()
@@ -37,13 +40,15 @@ def checkSettings():
             })
 
             save_json("settings.json", settings)
-        print(f'''rh_threshold = {settings['rh_threshold']}
-                    ec_threshold = {settings['ec_threshold']}
-                    pH_threshold = {settings['pH_threshold']}
-                    pH_pmp_time= {settings['pH_pmp_time']}
-                    rh_fan_time = {settings['rh_fan_time']}
-                    ec_pmp_time = {settings['ec_pmp_time']}
-                    timestamp= {settings['last_timestamp']}\n''')
+        # print(f'''rh_threshold = {settings['rh_threshold']}
+        #             ec_threshold = {settings['ec_threshold']}
+        #             pH_threshold = {settings['pH_threshold']}
+        #             pH_pmp_time= {settings['pH_pmp_time']}
+        #             rh_fan_time = {settings['rh_fan_time']}
+        #             ec_pmp_time = {settings['ec_pmp_time']}
+        #             timestamp= {settings['last_timestamp']}\n''')
+
+startTime = ticks_ms()
 
 while True:
     # Data Acquire
@@ -52,7 +57,7 @@ while True:
     # Data storage
     save_offline(data)
     
-    # EC comparision
+    # EC comparision    
     if data['tds'] < settings['ec_threshold']:
         pins.pump0.on()
         pins.pump1.on()
@@ -61,7 +66,7 @@ while True:
         pins.pump1.off()
         sleep(STABILIZATION_DELAY)
         data['ph'] = pins.read_ph_data()
-    
+        
     # ph comparision
     if data['ph'] > settings['pH_threshold']:
         pins.pump2.on()
@@ -83,8 +88,7 @@ while True:
     
     # check for new thresholds
     checkSettings()
-    
-    data = pins.read_data()
-    upload_sensor_data(credentials["DEVICE_ID"],INSERT_ENDPOINT,credentials["SUPABASE_ANON_KEY"],data["ph"], data["tds"], data["dht"][0], data["dht"][1])
-    sleep(READ_DELAY)
-
+    currTime = ticks_ms()
+    sleep_ms(READ_DELAY)
+    if ticks_diff(currTime, startTime) > RESTART_DELAY:
+        reset()
