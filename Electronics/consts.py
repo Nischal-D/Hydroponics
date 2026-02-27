@@ -13,8 +13,8 @@ class Pins:
     PIN_PH1       = 34
     PIN_PH2       = 33
     PIN_PH_TOGGLE = 21
-    MID_PH = 2.0
-    CALIBRATION_FACTOR = 0.5
+    MID_PH = 1.17128
+    CALIBRATION_FACTOR = -0.0649
     READ_INTERVAL_MS = 60000
 
     def __init__(self):
@@ -37,21 +37,20 @@ class Pins:
         sleep_ms(100)
         self.phToggle.off()
     
-    def read_ph_data(self):
-        if self.ph0.read() == 0 and self.ph1.read() == 0:
-            self.flashPH()
-            sleep_ms(500)
-        return {"ph"	: self.ph0.read_uv() - self.ph1.read_uv()}
-    
     def read_data(self):
+        tds = 0
+        for i in range(10):
+            sleep_ms(2)
+            tds += self.tds.read()
+        tds /= 10
         try:
             self.dht22.measure()
         except Exception as e:
-           return { "tds"	: self.tds.read(),
+           return { "tds"	: tds,
                     "dht"	: [18, 74],
                     "ph"	: self.read_ph_data()['ph']}
         
-        return {"tds"	: self.tds.read(),
+        return {"tds"	: tds,
                 "dht"	: [self.dht22.temperature(), self.dht22.humidity()],
                 "ph"	: self.read_ph_data()['ph']}
     
@@ -59,18 +58,15 @@ class Pins:
         if self.ph0.read_uv()==142000 and self.ph1.read_uv()==142000:
            self.flashPH()
            sleep(10)
-        ph1 = 0
         ph0 = 0 
-        for i in range(10):
+        for i in range(100):
+            sleep_ms(5)
             ph1 += self.ph1.read_uv() / 1e6
-            ph0 += self.ph0.read_uv() / 1e6
         
-        ph0 /= 10
-        ph1 /= 10
+        ph0 /= 100
         
-        data =  {"ph"	: 7 + (self.MID_PH - ph1 - ph0) / self.CALIBRATION_FACTOR,
-                "ph0"	: ph0,
-                "ph1"	: ph1}
+        data =  {"ph"	: 7 - (self.MID_PH - ph0) / self.CALIBRATION_FACTOR,
+                "ph0"	: ph0}
         return data
         
 

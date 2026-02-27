@@ -10,7 +10,7 @@ class SensorListAPIView(APIView):
     permission_classes = []  # public access
 
     def get(self, request):
-        sensor_data = SensorReading.objects.all().order_by('-timestamp')  # latest first
+        sensor_data = SensorReading.objects.all().order_by('-timestamp')[:50]
         serializer = SensorReadingSerializer(sensor_data, many=True)
         return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 

@@ -199,7 +199,11 @@ def flush_offline_data(credentials,INSERT_ENDPOINT):
     # Rewrite file with remaining lines
     if remaining_lines:
         with open(BUFFER_FILE, "w") as f:
-            f.writelines(remaining_lines)
+            for data in remaining_lines:
+                d = ujson.loads(data)
+                f.write(ujson.dumps(d) + "\n")
+        print("Network Error")
+        return
     else:
         os.remove(BUFFER_FILE)
         print("Offline buffer cleared")
