@@ -17,9 +17,18 @@ const Dashboard = () => {
       try {
         setLoading(true);
         const res = await API.get("sensors/");
-        const sensorsArray = Array.isArray(res.data) ? res.data : res.data.data;
+        // Robust data extraction
+        let sensorsArray = [];
+        if (Array.isArray(res.data)) {
+          sensorsArray = res.data;
+        } else if (res.data && Array.isArray(res.data.data)) {
+          sensorsArray = res.data.data;
+        } else if (res.data && typeof res.data === 'object') {
+          // Sometimes results are paginated or in a results field
+          sensorsArray = res.data.results || [];
+        }
 
-        if (sensorsArray && sensorsArray.length > 0) {
+        if (sensorsArray.length > 0) {
           // Take last entries, oldest first
           const history = [...sensorsArray].reverse();
           setSensorHistory(history);
@@ -91,7 +100,7 @@ const Dashboard = () => {
     if (!data || data.length === 0) return [];
 
     const now = new Date();
-    const cutoff = new Date(now.getTime() - 60 * 60 * 1000); // Past 1 hour
+    const cutoff = new Date(now.getTime() - 5 * 60 * 60 * 1000); // Past 5 hours
 
     const filtered = data.filter(item => new Date(item.timestamp) >= cutoff);
 
@@ -102,7 +111,8 @@ const Dashboard = () => {
   const sampleData = (data) => {
     if (!data || data.length === 0) return [];
 
-    const intervalMs = 2 * 60 * 1000; // 2 minute buckets for a 1-hour window
+    // Use a smaller bucket (1 minute) for a more "continuous" look
+    const intervalMs = 1 * 60 * 1000;
 
     const groups = {};
     data.forEach(item => {
@@ -149,7 +159,7 @@ const Dashboard = () => {
           <Card className="border-0 shadow-sm" style={{ borderRadius: "16px" }}>
             <Card.Body className="p-4">
               <div className="d-flex justify-content-between align-items-center mb-4">
-                <h5 className="mb-0">Nutrient Levels Overview (Past Hour)</h5>
+                <h5 className="mb-0">Nutrient Levels Overview (Past 5 Hours)</h5>
               </div>
 
               {/* Charts */}
@@ -161,7 +171,7 @@ const Dashboard = () => {
                     data={sampledHistory}
                     dataKey="ph"
                     status={latestSensor ? "Live" : "N/A"}
-                    color="#3b82f6"
+                    color="#10b981"
                     loading={loading}
                   />
                 </Col>

@@ -78,12 +78,12 @@ const NutrientChart = ({ title, currentValue, status, color, data = [], dataKey,
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
               <Tooltip content={<CustomTooltip />} />
               <Area
-                type="linear"
+                type="monotone"
                 dataKey={dataKey}
                 stroke={color}
                 fillOpacity={1}
                 fill={`url(#gradient-${dataKey})`}
-                strokeWidth={2}
+                strokeWidth={3}
                 animationDuration={1500}
                 connectNulls={true}
               />
