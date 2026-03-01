@@ -118,22 +118,21 @@
 
 \makeglossaries
 
-% Custom glossary style with uniform spacing
-\newglossarystyle{uniformlist}{%
-    \setglossarystyle{long}% base this style on the long style
-    \renewenvironment{theglossary}%
-    {\renewcommand{\arraystretch}{1.3}%
-        \begin{longtable}{@{}p{0.15\textwidth}p{0.75\textwidth}@{}}}%
-            {\end{longtable}}%
-    \renewcommand*{\glossaryheader}{}%
-    \renewcommand*{\glsgroupheading}[1]{}%
-    \renewcommand*{\glsgroupskip}{}%
-    \renewcommand{\glossentry}[2]{%
+\newglossarystyle{uniformlist}{
+    \setglossarystyle{long}
+    \renewenvironment{theglossary}
+    {\renewcommand{\arraystretch}{1.3}
+        \begin{longtable}{@{}p{0.2\textwidth}p{0.8\textwidth}@{}}}
+            {\end{longtable}}
+    \renewcommand*{\glossaryheader}{}
+    \renewcommand*{\glsgroupheading}[1]{}
+    \renewcommand*{\glsgroupskip}{}
+    \renewcommand{\glossentry}[2]{
         \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
         \glossentrydesc{##1}\tabularnewline[2pt]
     }%
-    \renewcommand*{\subglossentry}[3]{%
-        & \glssubentryitem{##2}%
+    \renewcommand*{\subglossentry}[3]{
+        & \glssubentryitem{##2}
         \glstarget{##2}{\strut}\glossentrydesc{##2}\tabularnewline[2pt]
     }%
 }

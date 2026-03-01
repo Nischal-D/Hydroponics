@@ -4,13 +4,13 @@ import { Container, Row, Col, Card, Form, Button, Badge } from "react-bootstrap"
 
 const PLANTS = {
   Lettuce: {
-    ph: [5.5, 6.5],
-    tds: [560, 840],
+    ph: [6.2, 6.0],
+    tds: [650, 650],
     // temperature: [15, 22],
-    humidity: [50, 70],
-    ph_pmp_time:[5, 15],
-    ec_pmp_time:[10, 20],
-    rh_fan_time:[15, 25],
+    humidity: [70, 80],
+    ph_pmp_time:[270, 265],
+    ec_pmp_time:[250, 245],
+    rh_fan_time:[500, 500],
   },
   // Basil: {
   //   ph: [5.5, 6.5],

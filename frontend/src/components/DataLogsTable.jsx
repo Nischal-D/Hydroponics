@@ -83,7 +83,7 @@ const DataLogsTable = () => {
                 <tr>
                   <th className="text-center">Time</th>
                   <th className="text-center">pH</th>
-                  <th className="text-center">EC / TDS</th>
+                  <th className="text-center">EC / TDS (ppm)</th>
                   <th className="text-center">Temp</th>
                   <th className="text-center">Humidity</th>
                 </tr>
