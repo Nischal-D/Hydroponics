@@ -5,7 +5,6 @@ import { X } from 'lucide-react';
 const AlertDetails = ({ alert, onClose }) => {
     if (!alert) return null;
 
-    // Get alert-specific details
     const getAlertDetails = () => {
         switch (alert.id) {
             case 1:
