@@ -1,138 +1,110 @@
-import React, { useState } from "react";
-import { Spinner } from "react-bootstrap";
+import React from 'react';
+import { Spinner } from 'react-bootstrap';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
-const NutrientChart = ({
-  title,
-  currentValue,
-  status,
-  color,
-  timeRange = "1hour",
-  loading = false,
-  data = [],
-}) => {
-  const [tooltip, setTooltip] = useState(null); // {x, y, label} or null
-
-  const displayValue = currentValue ?? "N/A";
-  const displayStatus = status ?? "N/A";
+const NutrientChart = ({ title, currentValue, status, color, data = [], dataKey, loading = false }) => {
+  const displayValue = currentValue ?? 'N/A';
+  const displayStatus = status ?? 'N/A';
   const chartHeight = 120;
-  const chartWidth = 600;
 
-  const chartData = data.slice(-6);
-
-  const minValue = Math.min(...chartData);
-  const maxValue = Math.max(...chartData);
-  const range = maxValue - minValue || 1;
-
-  // Chart path
-  const getChartPath = () => {
-    if (loading || chartData.length < 2) return `M0,${chartHeight} L${chartWidth},${chartHeight}`;
-    const stepX = chartWidth / (chartData.length - 1);
-
-    return chartData
-      .map((value, index) => {
-        const x = index * stepX;
-        const y = chartHeight - ((value - minValue) / range) * (chartHeight - 20) - 10;
-        return `${index === 0 ? "M" : "L"} ${x},${y}`;
-      })
-      .join(" ");
+  // Custom Tooltip for Recharts
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length > 0) {
+      const value = payload[0].value;
+      return (
+        <div className="bg-white p-2 border border-secondary rounded shadow-sm" style={{ fontSize: '0.8rem' }}>
+          <p className="mb-0 fw-bold">{new Date(label).toLocaleString([], { hour: '2-digit', minute: '2-digit' })}</p>
+          <p className="mb-0" style={{ color: color }}>
+            {typeof value === 'number' ? value.toFixed(2) : value}
+          </p>
+        </div>
+      );
+    }
+    return null;
   };
 
-  const chartPath = getChartPath();
-
-  // Y-axis labels step 10
-  const min = Math.floor(minValue / 10) * 10;
-  const max = Math.ceil(maxValue / 10) * 10;
-  const yLabels = [];
-  for (let val = min; val <= max; val += 10) yLabels.push(val);
-
-  const stepX = chartWidth / (chartData.length - 1);
+  // Format X-Axis ticks
+  const formatXAxis = (tickItem) => {
+    if (!tickItem) return '';
+    const date = new Date(tickItem);
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
 
   return (
-    <div className="mb-3" style={{ position: "relative" }}>
-      {/* Title and Value */}
+    <div className="mb-3">
       <div className="d-flex justify-content-between align-items-center mb-2">
-        <h6 className="text-muted mb-0" style={{ fontSize: "0.85rem" }}>{title}</h6>
-        <span className="text-muted" style={{ fontSize: "0.75rem" }}>{loading ? "Loading..." : displayStatus}</span>
+        <h6 className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>{title}</h6>
+        <div className="d-flex align-items-center">
+          {loading ? (
+            <span className="text-muted" style={{ fontSize: '0.75rem' }}>Loading...</span>
+          ) : (
+            <>
+              <div
+                className="me-2 rounded-circle"
+                style={{
+                  width: '8px',
+                  height: '8px',
+                  backgroundColor: status === 'Live' ? '#10b981' : '#ccc',
+                  boxShadow: status === 'Live' ? '0 0 8px #10b981' : 'none'
+                }}
+              />
+              <span className="text-muted" style={{ fontSize: '0.75rem' }}>{displayStatus}</span>
+            </>
+          )}
+        </div>
       </div>
+
       <div className="mb-2">
-        <span className="fw-bold" style={{ fontSize: "1.5rem", color }}>
+        <span className="fw-bold" style={{ fontSize: '1.5rem', color: color }}>
           {loading ? <Spinner animation="border" size="sm" /> : displayValue}
         </span>
       </div>
 
-      {/* Chart */}
-      <div style={{ position: "relative", height: `${chartHeight}px`, marginBottom: "10px" }}>
-        <svg width="100%" height={chartHeight + 20} style={{ display: "block" }}>
-          {/* Horizontal grid lines */}
-          {yLabels.map((val, i) => {
-            const y = chartHeight - ((val - minValue) / range) * (chartHeight - 20) - 10;
-            return (
-              <line key={i} x1={0} y1={y} x2={chartWidth} y2={y} stroke="#f0f0f0" strokeWidth="1" />
-            );
-          })}
-
-          {/* Chart fill */}
-          <path d={`${chartPath} L${chartWidth},${chartHeight} L0,${chartHeight} Z`} fill={`${color}20`} stroke="none" />
-          {/* Chart line */}
-          <path d={chartPath} fill="none" stroke={color} strokeWidth="2" />
-
-          {/* Y-axis labels */}
-          {yLabels.map((val, i) => {
-            const y = chartHeight - ((val - minValue) / range) * (chartHeight - 20) - 10 + 4;
-            return <text key={i} x={0} y={y} fontSize="10" fill="#999">{val}</text>;
-          })}
-
-          {/* X-axis label */}
-          <text x={chartWidth / 2} y={chartHeight + 15} fontSize="10" fill="#999" textAnchor="middle">
-            Past hour
-          </text>
-
-          {/* Hover points */}
-          {chartData.map((val, i) => {
-            const x = i * stepX;
-            const y = chartHeight - ((val - minValue) / range) * (chartHeight - 20) - 10;
-
-            return (
-              <circle
-                key={i}
-                cx={x}
-                cy={y}
-                r={4}
-                fill={color}
-                stroke="#fff"
-                strokeWidth={1}
-                onMouseEnter={() => setTooltip({ x, y, value: val, label: "Past hour" })}
-                onMouseLeave={() => setTooltip(null)}
-              />
-            );
-          })}
-        </svg>
-
-        {/* Tooltip */}
-        {tooltip && (
-          <div
-            style={{
-              position: "absolute",
-              left: tooltip.x + 10,
-              top: tooltip.y - 30,
-              background: "#333",
-              color: "#fff",
-              padding: "4px 6px",
-              borderRadius: "4px",
-              fontSize: "0.75rem",
-              pointerEvents: "none",
-            }}
-          >
-            {tooltip.label}: {tooltip.value}
+      <div style={{ position: 'relative', height: `${chartHeight}px`, marginBottom: '10px' }}>
+        {loading || !data || data.length === 0 ? (
+          <div className="d-flex justify-content-center align-items-center h-100 text-muted" style={{ fontSize: '0.8rem' }}>
+            {loading ? 'Loading Chart...' : 'No Data Available'}
           </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+              <defs>
+                <linearGradient id={`gradient-${dataKey}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={color} stopOpacity={0.3} />
+                  <stop offset="95%" stopColor={color} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey={dataKey}
+                stroke={color}
+                fillOpacity={1}
+                fill={`url(#gradient-${dataKey})`}
+                strokeWidth={3}
+                animationDuration={1500}
+                connectNulls={true}
+              />
+              <XAxis
+                dataKey="timestamp"
+                tick={{ fontSize: '10px', fill: '#999' }}
+                tickFormatter={formatXAxis}
+                axisLine={false}
+                tickLine={false}
+                minTickGap={30}
+              />
+              <YAxis hide domain={['auto', 'auto']} />
+            </AreaChart>
+          </ResponsiveContainer>
         )}
       </div>
 
-      {/* Bottom Info */}
-      <div className="d-flex justify-content-between mt-2" style={{ fontSize: "0.7rem", color: "#999" }}>
+      <div className="d-flex justify-content-between mt-2" style={{ fontSize: '0.7rem', color: '#999' }}>
         <span>Low</span>
         <span>Time →</span>
-        <span>{loading ? "N/A" : displayStatus}</span>
+        <span>{loading ? 'N/A' : displayStatus}</span>
       </div>
     </div>
   );
