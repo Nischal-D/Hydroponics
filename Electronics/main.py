@@ -10,7 +10,6 @@ READ_DELAY = 400000
 STABILIZATION_DELAY = 300
 RESTART_DELAY = 3600000
 
-sleep(2)
 pins = Pins()
 
 credentials = init_credentials()
@@ -40,13 +39,13 @@ def checkSettings():
             })
 
             save_json("settings.json", settings)
-        # print(f'''rh_threshold = {settings['rh_threshold']}
-        #             ec_threshold = {settings['ec_threshold']}
-        #             pH_threshold = {settings['pH_threshold']}
-        #             pH_pmp_time= {settings['pH_pmp_time']}
-        #             rh_fan_time = {settings['rh_fan_time']}
-        #             ec_pmp_time = {settings['ec_pmp_time']}
-        #             timestamp= {settings['last_timestamp']}\n''')
+        print(f'''rh_threshold = {settings['rh_threshold']}
+                    ec_threshold = {settings['ec_threshold']}
+                    pH_threshold = {settings['pH_threshold']}
+                    pH_pmp_time= {settings['pH_pmp_time']}
+                    rh_fan_time = {settings['rh_fan_time']}
+                    ec_pmp_time = {settings['ec_pmp_time']}
+                    timestamp= {settings['last_timestamp']}\n''')
 
 startTime = ticks_ms()
 
@@ -57,24 +56,31 @@ while True:
     # Data storage
     save_offline(data)
     
-    # EC comparision    
+    # EC comparision
+    
     if data['tds'] < settings['ec_threshold']:
-        pins.pump0.on()
+        print("TDS Regulation")
         pins.pump1.on()
         sleep_ms(settings['ec_pmp_time'])
-        pins.pump0.off()
         pins.pump1.off()
+        sleep_ms(200)
+        pins.pump0.on()
+        sleep_ms(settings['ec_pmp_time'])
+        pins.pump0.off()      
+        
         sleep(STABILIZATION_DELAY)
         data['ph'] = pins.read_ph_data()
-        
+    
     # ph comparision
     if data['ph'] > settings['pH_threshold']:
+        print("PH Regulation")
         pins.pump2.on()
         sleep_ms(settings['pH_pmp_time'])
         pins.pump2.off()
         
     # rh comparision
     if data['dht'][1] > settings['rh_threshold']:
+        print("RH Regulation")
         pins.fan.on()
         sleep_ms(settings['rh_fan_time'])
         pins.fan.off()
@@ -92,3 +98,4 @@ while True:
     sleep_ms(READ_DELAY)
     if ticks_diff(currTime, startTime) > RESTART_DELAY:
         reset()
+
