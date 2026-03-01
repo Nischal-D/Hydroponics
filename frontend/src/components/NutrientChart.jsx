@@ -101,11 +101,6 @@ const NutrientChart = ({ title, currentValue, status, color, data = [], dataKey,
         )}
       </div>
 
-      <div className="d-flex justify-content-between mt-2" style={{ fontSize: '0.7rem', color: '#999' }}>
-        <span>Low</span>
-        <span>Time →</span>
-        <span>{loading ? 'N/A' : displayStatus}</span>
-      </div>
     </div>
   );
 };

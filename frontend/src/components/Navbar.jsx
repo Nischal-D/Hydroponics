@@ -89,7 +89,7 @@ const AppNavbar = ({ onLogout }) => {
           {/* Right Controls */}
           <div className="d-flex align-items-center gap-3 ms-auto text-light flex-nowrap">
             
-            <div className="d-none d-md-block me-3">
+            <div className="d-none d-lg-block me-3">
               {currentDate} | {currentTime}
             </div>
 

@@ -71,7 +71,7 @@ const Dashboard = () => {
       id: 2,
       title: "EC/TDS",
       value: latestSensor?.tds ?? "N/A",
-      unit: "mS/cm",
+      unit: "ppm",
       status: latestSensor ? (latestSensor.tds > 2.0 ? "High" : "Optimal") : "N/A",
       color: "#1abc9c",
       icon: Zap,
@@ -159,12 +159,12 @@ const Dashboard = () => {
           <Card className="border-0 shadow-sm" style={{ borderRadius: "16px" }}>
             <Card.Body className="p-4">
               <div className="d-flex justify-content-between align-items-center mb-4">
-                <h5 className="mb-0">Nutrient Levels Overview (Past 5 Hours)</h5>
+                <h5 className="mb-0">Nutrient Levels Overview </h5>
               </div>
 
               {/* Charts */}
-              <Row>
-                <Col md={6}>
+              <Row className="justify-content-evenly">
+                <Col md={5}>
                   <NutrientChart
                     title="pH Levels"
                     currentValue={latestSensor?.ph}
@@ -176,7 +176,7 @@ const Dashboard = () => {
                   />
                 </Col>
 
-                <Col md={6}>
+                <Col md={5}>
                   <NutrientChart
                     title="EC Levels"
                     currentValue={latestSensor?.tds}
