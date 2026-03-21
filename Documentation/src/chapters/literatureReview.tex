@@ -14,7 +14,7 @@ higher crop productivity, uniform growth , and reduced dependency on soil qualit
 One of the primary advantages of hydroponics over conventional soil-based farming is its
 superior resource efficiency. Barbosa et al. \cite{barbosa2015} conducted a comparative
 analysis of lettuce production using hydroponic and conventional farming methods that
-showed hydroponic systems can reduce water consumption by 70–90\% due to nutrient
+showed hydroponic systems can reduce water consumption by 70-90\% due to nutrient
 solution recirculation, significantly minimizing losses from evaporation and percolation.
 Furthermore, the direct delivery of nutrients to the root zone improves fertilizer use
 efficiency and reduces nutrient leaching into the environment, addressing major ecological
@@ -48,7 +48,7 @@ which is time-consuming, susceptible to human error, and often inconsistent. Ear
 automation efforts primarily focused on timer-based nutrient dosing. However, advancements
 in low-cost, reliable sensors and microcontrollers have enabled closed-loop feedback
 control systems. Mendoza et al. \cite{mendoza2020} demonstrated an automated hydroponic
-system using Arduino-based pH and EC sensing combined with Proportional–Integral–Derivative
+system using Arduino-based pH and EC sensing combined with Proportional-Integral-Derivative
 (PID) control and peristaltic pumps, resulting in more stable growing conditions compared
 to manual control. Similarly, Nam et al. \cite{nam1996} contrasted conventional farming
 with hydroponics, aeroponics, and aquaponics, emphasizing the critical role automation plays
@@ -73,3 +73,55 @@ and calibration drift during continuous operation. Additionally, there is a grow
 flexible and cost-effective solutions tailored to small-scale, urban, and indoor farming
 applications, as many existing systems are designed for specific crops or large-scale commercial
 use.
+
+
+\renewcommand{\arraystretch}{1.4}
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|
+p{0.65cm}|
+p{1.75cm}|
+p{2.2cm}|
+p{1.9cm}|
+p{2.05cm}|
+p{2.2cm}|
+p{2.3cm}|}
+
+\caption{Comparison of Existing Systems with Designed System} \\
+\hline
+\textbf{S.N.} & \textbf{Reference} & \textbf{System Type} & \textbf{Control Method} & \textbf{Key Features} & \textbf{Limitations} & \textbf{Comparison with designed System} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{S.N.} & \textbf{Reference} & \textbf{System Type} & \textbf{Control Method} & \textbf{Key Features} & \textbf{Limitations} & \textbf{Comparison with designed System} \\
+\hline
+\endhead
+
+1 & Gericke (1937) [1] & Basic Hydroponics & Manual & Introduced concept of soilless farming & No automation, no monitoring system & Designed system adds full automation and real-time control \\
+\hline
+
+2 & Savvas \& Gruda (2018) [2] & Soilless Cultivation & Manual / Semi - automated & Improved yield and efficiency & Limited automation and control precision & Designed system enables precise parameter control using sensors \\
+\hline
+
+3 & Barbosa et al. (2015) [3] & Hydroponic vs Conventional & Not control - focused & High water efficiency (70--90\% saving) & No control system implemented & Designed system integrates control and monitoring for efficiency \\
+\hline
+
+4 & Trejo- Téllez \& Gómez- Merino (2012) [4] & Nutrient Solution Study & Manual & Defined optimal pH and nutrient ranges & No real-time monitoring or automation & Designed system automates maintaining these optimal ranges \\
+\hline
+
+5 & Hansen (1978) [5] & Nutrient Management & Manual & Explained EC and pH importance & No automation, prone to human error & Designed system eliminates manual adjustment errors \\
+\hline
+
+6 & Mendoza et al. (2020) [6] & Automated Hydroponic System & PID Control & Closed- loop control using sensors and pumps & Complex tuning, risk of overshoot, higher computation & Designed system uses simpler threshold- based control with stabilization delay \\
+\hline
+
+7 & Nam et al. (1996) [7] & Hydroponic Environment Control & Partial automation & Improved crop growth using controlled environment & Limited parameter control and no IoT integration & Designed system adds IoT monitoring and full automation \\
+\hline
+
+8 & Kumar et al. (2021) [8] & IoT Hydroponic Systems & Varies (general review) & Cloud monitoring, remote access & Lacks optimized control strategy for low-cost systems & Designed system integrates IoT + efficient low-cost control method \\
+\hline
+
+9 & Designed System & Fully Automated Hydroponic with IoT & Threshold based Closed loop & Real time monitoring, automated dosing, IoT dashboard, stabilization delay & Limited to single crop, frequent calibration & -- \\
+\hline
+
+\end{longtable}

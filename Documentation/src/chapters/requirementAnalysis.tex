@@ -1,0 +1,20 @@
+\chapter{REQUIREMENT ANALYSIS}
+\section{Functional Requirements}
+The system must continuously monitor four critical parameters: pH, electrical conductivity (EC/TDS), temperature, and relative humidity at regular 10-minute intervals. It must execute closed-loop control by automatically activating dosing pumps when pH or EC values deviate from crop-specific setpoints, prioritizing EC correction before pH adjustment to avoid interaction effects. A stabilization delay must be enforced after each dosing event before re-measurement to prevent overshoot. The system must also activate an exhaust fan when ambient humidity exceeds the defined threshold.
+Sensor data must be transmitted wirelessly via Wi-Fi to a cloud database with timestamps, and made accessible through a web-based dashboard and historical trends. Users must be able to remotely update setpoints, calibration parameters, and pump activation durations through the interface.
+ 
+\section{Non-Functional Requirements}
+The system must operate autonomously with minimal human intervention, maintaining pH within ±1 units and EC within ±200 ppm of their respective setpoints. Corrective response must bring parameters back within acceptable limits in under 10 minutes of deviation detection. Sensor accuracy requirements are ±0.1 pH for the pH sensor and ±2.5\% for the TDS sensor. The overall system must be cost-effective, with the total hardware budget kept under NPR 20,000, and built using open-source software to eliminate licensing costs.
+ 
+\section{Hardware Requirements}
+The control unit requires an ESP32-WROOM32 microcontroller with sufficient GPIO availability for analog sensing without Wi-Fi interference, specifically using pins GPIO32-36 and GPIO39. Power management must include a 12V regulated adapter, LM2596 buck converter.
+
+\section{Constraints}
+The system is scoped for single-crop cultivation (lettuce) in small-scale indoor environments. Large-scale multi-crop industrial deployments fall outside the current design boundaries.
+
+
+
+
+
+
+
