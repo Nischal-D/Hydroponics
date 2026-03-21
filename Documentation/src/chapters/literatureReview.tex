@@ -6,7 +6,7 @@ provided sufficient aeration is maintained, was established by Gericke’s semin
 in 1937, which demonstrated the commercial viability of “aquaculture” \cite{gericke1937}.
 This work laid the foundation for modern Controlled Environment Agriculture (CEA).\\[10pt]
 Since then, hydroponic technology has evolved massively and is now widely adopted in
-greenhouses, vertical farms, and indoor cultivation systems. The limitations of conventional
+greenhouses, vertical farms, and indoor cultivation of plants. The limitations of conventional
 soil-based agriculture are reduced as CEA integrates environmental control, nutrient
 management, and automation. Savvas and Gruda \cite{savvas2018} emphasized that soilless
 cultivation technologies play a critical role in modern greenhouse production by enabling
@@ -14,13 +14,13 @@ higher crop productivity, uniform growth , and reduced dependency on soil qualit
 One of the primary advantages of hydroponics over conventional soil-based farming is its
 superior resource efficiency. Barbosa et al. \cite{barbosa2015} conducted a comparative
 analysis of lettuce production using hydroponic and conventional farming methods that
-showed hydroponic systems can reduce water consumption by 70-90\% due to nutrient
+showed hydroponics can reduce water consumption by 70-90\% due to nutrient
 solution recirculation, significantly minimizing losses from evaporation and percolation.
 Furthermore, the direct delivery of nutrients to the root zone improves fertilizer use
 efficiency and reduces nutrient leaching into the environment, addressing major ecological
 concerns associated with traditional agriculture \cite{savvas2018}.\\[10pt]
 Another major benefit of hydroponics is the improved efficiency of nutrient utilization. In
-soil-based systems, nutrients may become unavailable due to fixation, leaching, or microbial
+soil-based farming, nutrients may become unavailable due to fixation, leaching, or microbial
 competition. In contrast, hydroponics delivers nutrients directly to the root zone in soluble
 ionic forms, allowing precise control over nutrient composition and concentration \cite{trejo2012}.
 This direct nutrient delivery reduces fertilizer wastage and minimizes environmental
@@ -38,7 +38,7 @@ estimate of overall nutrient concentration. Maintaining EC within crop-specific 
 essential to avoid osmotic stress, nutrient deficiencies, or toxicities. Low EC values may
 result in inadequate nutrient supply, whereas excessively high EC levels can damage
 plant roots, reduce water uptake, and negatively impact plant growth and yield \cite{hansen1978}.\\[10pt]
-Nutrient management in hydroponic systems is made more difficult by the relationship
+Nutrient management in hydroponics is made more difficult by the relationship
 between pH and EC. The pH of a solution can be affected by changes in nutrient concentration,
 and nutritional ion balance can be changed by pH alterations. Therefore, to maintain ideal
 growing conditions and guarantee steady plant development, accurate and ongoing
@@ -52,28 +52,27 @@ system using Arduino-based pH and EC sensing combined with Proportional-Integral
 (PID) control and peristaltic pumps, resulting in more stable growing conditions compared
 to manual control. Similarly, Nam et al. \cite{nam1996} contrasted conventional farming
 with hydroponics, aeroponics, and aquaponics, emphasizing the critical role automation plays
-in increasing system accuracy, lowering human error, and guaranteeing consistent root-zone
+in increasing accuracy, lowering human error, and guaranteeing consistent root-zone
 conditions. Continuous monitoring and prompt corrective intervention are made possible by
 automated devices, which are especially crucial for green products like lettuce that develop
 quickly.\\[10pt]
-The integration of the Internet of Things (IoT) represents the next evolutionary stage of
-hydroponic automation. IoT-enabled systems support cloud-based data storage, real-time
+The integration of Internet of Things (IoT) represents the next evolutionary stage of
+hydroponic automation. IoT-enabled projects support cloud-based data storage, real-time
 remote monitoring through web or mobile interfaces, and automated warning generation.
 A review by Kumar et al. \cite{kumar2021} concluded that IoT-based hydroponic frameworks
-enhance system traceability, provide decision-support capabilities, and facilitate the integration
+enhance traceability, provide decision-support capabilities, and facilitate the integration
 of predictive control techniques, including machine learning models.\\[10pt]
-IoT makes it possible to continuously monitor environmental factors, system performance,
+IoT makes it possible to continuously monitor environmental factors, performance,
 and fertilizer parameters in hydroponic applications without the need for constant personal
 presence. Long-term trend analysis of pH, EC, temperature, and humidity is made possible
-by data logging, which supports data-driven optimization and early system anomaly detection.
+by data logging, which supports data-driven optimization and early anomaly detection.
 IoT solutions also make it possible to provide alerts when parameters depart from permitted
 ranges, which lowers the risk of crop damage and permits quick corrective action \cite{kumar2021}.\\[10pt]
 Despite these advancements, several challenges remain, particularly regarding sensor reliability
 and calibration drift during continuous operation. Additionally, there is a growing need for
 flexible and cost-effective solutions tailored to small-scale, urban, and indoor farming
-applications, as many existing systems are designed for specific crops or large-scale commercial
+applications, as many existing methods are designed for specific crops or large-scale commercial
 use.
-
 
 \renewcommand{\arraystretch}{1.4}
 \setlength{\tabcolsep}{3pt}
@@ -97,28 +96,28 @@ p{2.3cm}|}
 \hline
 \endhead
 
-1 & Gericke (1937) [1] & Basic Hydroponics & Manual & Introduced concept of soilless farming & No automation, no monitoring system & Designed system adds full automation and real-time control \\
+1 & Gericke (1937) \cite{gericke1937} & Basic Hydroponics & Manual & Introduced concept of soilless farming & No automation, no monitoring system & Full automation and real-time control \\
 \hline
 
-2 & Savvas \& Gruda (2018) [2] & Soilless Cultivation & Manual / Semi - automated & Improved yield and efficiency & Limited automation and control precision & Designed system enables precise parameter control using sensors \\
+2 & Savvas \& Gruda (2018) \cite{savvas2018} & Soilless Cultivation & Manual / Semi - automated & Improved yield and efficiency & Limited automation and control precision & Precise parameter control using sensors \\
 \hline
 
-3 & Barbosa et al. (2015) [3] & Hydroponic vs Conventional & Not control - focused & High water efficiency (70--90\% saving) & No control system implemented & Designed system integrates control and monitoring for efficiency \\
+3 & Barbosa et al. (2015) \cite{barbosa2015} & Hydroponic vs Conventional & Not control - focused & High water efficiency (70--90\% saving) & No control system implemented & Control and monitoring for efficiency \\
 \hline
 
-4 & Trejo- Téllez \& Gómez- Merino (2012) [4] & Nutrient Solution Study & Manual & Defined optimal pH and nutrient ranges & No real-time monitoring or automation & Designed system automates maintaining these optimal ranges \\
+4 & Trejo- Téllez \& Gómez- Merino (2012) \cite{trejo2012} & Nutrient Solution Study & Manual & Defined optimal pH and nutrient ranges & No real-time monitoring or automation & Maintenance of optimal ranges \\
 \hline
 
-5 & Hansen (1978) [5] & Nutrient Management & Manual & Explained EC and pH importance & No automation, prone to human error & Designed system eliminates manual adjustment errors \\
+5 & Hansen (1978) \cite{hansen1978}& Nutrient Management & Manual & Explained EC and pH importance & No automation, prone to human error & Elimination of manual adjustment errors \\
 \hline
 
-6 & Mendoza et al. (2020) [6] & Automated Hydroponic System & PID Control & Closed- loop control using sensors and pumps & Complex tuning, risk of overshoot, higher computation & Designed system uses simpler threshold- based control with stabilization delay \\
+6 & Mendoza et al. (2020) \cite{mendoza2020} & Automated Hydroponic System & PID Control & Closed- loop control using sensors and pumps & Complex tuning, risk of overshoot, higher computation & Simpler threshold- based control with stabilization delay \\
 \hline
 
-7 & Nam et al. (1996) [7] & Hydroponic Environment Control & Partial automation & Improved crop growth using controlled environment & Limited parameter control and no IoT integration & Designed system adds IoT monitoring and full automation \\
+7 & Nam et al. (1996) \cite{nam1996} & Hydroponic Environment Control & Partial automation & Improved crop growth using controlled environment & Limited parameter control and no IoT integration & IoT monitoring \\
 \hline
 
-8 & Kumar et al. (2021) [8] & IoT Hydroponic Systems & Varies (general review) & Cloud monitoring, remote access & Lacks optimized control strategy for low-cost systems & Designed system integrates IoT + efficient low-cost control method \\
+8 & Kumar et al. (2021) \cite{kumar2021} & IoT Hydroponic Systems & Varies (general review) & Cloud monitoring, remote access & Lacks optimized control strategy for low-cost systems & IoT+ efficient low-cost control method \\
 \hline
 
 9 & Designed System & Fully Automated Hydroponic with IoT & Threshold based Closed loop & Real time monitoring, automated dosing, IoT dashboard, stabilization delay & Limited to single crop, frequent calibration & -- \\
