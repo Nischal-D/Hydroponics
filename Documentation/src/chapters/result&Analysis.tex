@@ -1,7 +1,7 @@
-\chapter{RESULT AND ANALYSIS}
-The Automated Nutrient Dosing and Monitoring System, at the current level of its development, collects the data of pH, TDS, temperature, and humidity sensors and presents it on a web-based dashboard. The sensors are linked to ESP32 microcontroller, which monitors real time environmental and nutrient variables of the hydroponic system. The ESP32 sends this sensor data to a cloud database via the Wi-Fi connection, where the readings are stored in a cloud database together with timestamps.
+\chapter{RESULTS AND ANALYSIS}
+The Automated Nutrient Dosing and Monitoring System, at the current level of its development, collects the data of pH, TDS, temperature, and humidity sensors and presents it on a web-based dashboard. The sensors are linked to the ESP32 microcontroller, which monitors real time environmental and nutrient variables of the hydroponic system. The ESP32 sends this sensor data to a cloud database via the Wi-Fi connection, where the readings are stored in a cloud database together with timestamps.
 \\[10pt]
-The data is then stored and can be accessed and displayed on the site so that users can monitor pH, nutrient concentration, temperature and humidity. The dashboard presents both live values and graphical trends, confirming that sensor data acquisition, wireless communication, database storage, and frontend visualization are working correctly. These results demonstrate that the system is able to reliably sense, transmit, store, and display hydroponic parameters in real time. Users also have the ability to change threshold values as is required for different crops.
+The data is then stored and can be accessed and displayed on the web dashboard so that users can monitor pH, nutrient concentration, temperature and humidity. The dashboard presents both live values and graphical trends, confirming that sensor data acquisition, wireless communication, database storage, and frontend visualization are working correctly. These results demonstrate that the system is able to reliably sense, transmit, store, and display hydroponic parameters in real time. Users can also update threshold values to suit different crops.
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth,height=7cm]{src/images/dashboard.png}
@@ -28,7 +28,7 @@ Therefore pins ESP32 GPIO34 (ADC1\_CH6), GPIO35 (ADC1\_CH7), and GPIO32 pins wer
 \end{figure}
 
 The pH fluctuation graph recorded over 1 week (168-hour period) demonstrates the closed-loop control system working consistently within the optimal range of 6.0 to 6.5 for lettuce cultivation. The actual range for lettuce is 5.5 to 6.5 pH but the lower threshold of 6.0 pH was kept to avoid overdosing. Through the data, we can observe a recurring sawtooth pattern throughout the entire week, which is characteristic of threshold-based control. In each cycle, pH rises gradually due to the absorption of anions such as nitrate and phosphate by the lettuce roots as a result of nutrient dosing, which progressively alkalises the solution. Once pH reaches the upper threshold of 6.5, the acid dosing pump is turned, delivering a measured quantity of pH-down solution that brings the value back down to approximately 6.1 to 6.2, after which the natural gradual upward drift can be seen again after the observed sharp drop due to adding acidic pH balancing solution.
-The amplitude of each cycle remains consistent at approximately 0.30 to 0.38 pH units, and the correction response is applied reliably across all seven days without any instance of the value crossing the defined boundaries. The system did not require pH up dosing at any point during the observation period, which aligns with expected behaviour since lettuce systems under normal operating conditions tend to alkalise rather than acidise the solution. These results confirm that the pH regulation subsystem is working correctly and maintaining solution chemistry within the crop-specific tolerance band.
+The amplitude of each cycle remains consistent at approximately $\pm$0.30--0.38 pH units, and the correction response is applied reliably across all seven days without any instance of the value crossing the defined boundaries. The system did not require pH up dosing at any point during the observation period, which aligns with expected behaviour since lettuce systems under normal operating conditions tend to alkalise rather than acidify the solution. These results confirm that the pH regulation subsystem is working correctly and maintaining solution chemistry within the crop-specific tolerance band.
 Since the pH meter used was not a continuous measurement industrial grade equipment, the pen-type commercial pH meter had to be recalibrated rather frequently due to deviation from true pH value reflected by a spare pen-type pH meter. To mitigate inaccuracies and accidental dosing due to inaccurate pH readings, the pH meter continually submerged in the solution was recalibrated with given buffer solutions every 4 days. Along with recalibration, new values of the interpolated $MID\_PH_{7}$ had to be calculated since the measured electrode potentials were also observed to deviate. 
 
 \begin{figure}[H]
@@ -44,13 +44,13 @@ Since the pH meter used was not a continuous measurement industrial grade equipm
     \caption{TDS Fluctuation Graph over a week}
     \label{fig: tdsGraph}
 \end{figure}
-The graph above displays the TDS fluctuation over a 1 week time period showing two distinct phases of behavior. During the first 40 hour mark a steep continuous decline is observed from approximately 780 units down to 640 units, representing a drop of roughly 140 units before the first dosing correction event occurs. The decline is slightly steeper than the expected 60 to 70 units drop per day for mature stages of lettuce, and is attributed to the initial TDS value being in the higher quarter of the threshold range. From 40 hours onward, a sawtooth oscillation can be observed between the ranges of approximately 630 to 690 units, showcasing the activation of the nutrient dosing pump to compensate for the decline caused by plant uptake and evaporation. Each dosing event produces an abrupt upward correction of approximately 30 to 60 units, followed by a gradual decline as nutrients are consumed. The system successfully prevents TDS from falling below the minimum threshold of 560 units throughout the observation period.
+The graph above displays the TDS fluctuation over a 1 week time period showing two distinct phases of behavior. During the first 40 hour mark a steep continuous decline is observed from approximately 780 units down to 640 units, representing a drop of roughly 140 units before the first dosing correction event occurs. The decline is slightly steeper than the expected 60 to 70 units drop per day for mature stages of lettuce, and is attributed to the initial TDS value being in the higher quarter of the threshold range. From 40 hours onward, a sawtooth oscillation can be observed between the ranges of approximately 630 to 690 units, demonstrating the activation of the nutrient dosing pump to compensate for the decline caused by plant uptake and evaporation. Each dosing event produces an abrupt upward correction of approximately 30 to 60 units, followed by a gradual decline as nutrients are consumed. The system successfully prevents TDS from falling below the minimum threshold of 560 units throughout the observation period.
 
 
 \begin{table}[H]
 \centering
 \caption{System performance vs benchmark targets}
-\label{tab:PerfromanceComparison}
+\label{tab:PerformanceComparison}
 \renewcommand{\arraystretch}{1.4}
 \begin{tabularx}{\textwidth}{|
 >{\arraybackslash}L|
@@ -58,7 +58,7 @@ The graph above displays the TDS fluctuation over a 1 week time period showing t
 >{\arraybackslash}X|
 >{\arraybackslash}X|}
 \hline
-\textbf{S.N.} & \textbf{Perfromance Metric} & \textbf{Manual System (Reference)} & \textbf{Designed System}\\
+\textbf{S.N.} & \textbf{Performance Metric} & \textbf{Manual System (Reference)} & \textbf{Designed System}\\
 \hline
 1 & pH deviation ($\pm$ units)         & 0.6--1.2   & 0.30--0.38\\
 \hline

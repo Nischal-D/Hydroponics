@@ -4,10 +4,10 @@ The system must continuously monitor four critical parameters: pH, electrical co
 Sensor data must be transmitted wirelessly via Wi-Fi to a cloud database with timestamps, and made accessible through a web-based dashboard and historical trends. Users must be able to remotely update setpoints, calibration parameters, and pump activation durations through the interface.
  
 \section{Non-Functional Requirements}
-The system must operate autonomously with minimal human intervention, maintaining pH within ±1 units and EC within ±200 ppm of their respective setpoints. Corrective response must bring parameters back within acceptable limits in under 10 minutes of deviation detection. Sensor accuracy requirements are ±0.1 pH for the pH sensor and ±2.5\% for the TDS sensor. The overall system must be cost-effective, with the total hardware budget kept under NPR 20,000, and built using open-source software to eliminate licensing costs.
+The system must operate autonomously with minimal human intervention, maintaining pH within ±1 unit and EC within ±200 ppm of their respective setpoints. Corrective response must bring parameters back within acceptable limits in under 10 minutes of deviation detection. Sensor accuracy requirements are ±0.1 pH for the pH sensor and ±2.5\% for the TDS sensor. The overall system must be cost-effective, with the total hardware budget kept under NPR 20,000, and built using open-source software to eliminate licensing costs.
  
 \section{Hardware Requirements}
-The control unit requires an ESP32-WROOM32 microcontroller with sufficient GPIO availability for analog sensing without Wi-Fi interference, specifically using pins GPIO32-36 and GPIO39. Power management must include a 12V regulated adapter, LM2596 buck converter.
+The control unit requires an ESP32-WROOM32 microcontroller with sufficient GPIO availability for analog sensing without Wi-Fi interference, specifically using pins GPIO32-36 and GPIO39. Power management must include a 12V regulated adapter and an LM2596 buck converter.
 
 \section{Constraints}
 The system is scoped for single-crop cultivation (lettuce) in small-scale indoor environments. Large-scale multi-crop industrial deployments fall outside the current design boundaries.
