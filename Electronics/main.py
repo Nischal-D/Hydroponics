@@ -6,7 +6,7 @@ from defaults import *
 from machine import ADC, Pin, reset
 from utime import ticks_ms, ticks_diff
 
-READ_DELAY = 400000
+READ_DELAY = 510000
 STABILIZATION_DELAY = 300
 RESTART_DELAY = 3600000
 
@@ -98,4 +98,3 @@ while True:
     sleep_ms(READ_DELAY)
     if ticks_diff(currTime, startTime) > RESTART_DELAY:
         reset()
-

@@ -14,8 +14,8 @@ class Pins:
     PIN_PH1       = 34
     PIN_PH2       = 33
     PIN_PH_TOGGLE = 21
-    MID_PH = 1.17128
-    CALIBRATION_FACTOR = -0.0649
+    MID_PH = 1.180
+    CALIBRATION_FACTOR = -0.05196
     READ_INTERVAL_MS = 60000
 
     def __init__(self):
@@ -29,6 +29,11 @@ class Pins:
         self.ph0  	= ADC(Pin(self.PIN_PH1))
         self.ph1 	= ADC(Pin(self.PIN_PH2))
         self.phToggle = Pin(self.PIN_PH_TOGGLE, Pin.OUT)
+        
+        self.pump0.off()
+        self.pump1.off()
+        self.pump2.off()
+        self.fan.off()
 
         for adc in (self.ph0, self.ph1, self.tds):
             adc.atten(ADC.ATTN_11DB)
@@ -54,7 +59,7 @@ class Pins:
         except Exception as e:
             self.tdsControl.off()
             return {"tds"	: tds,
-                    "dht"	: [18, 74],
+                    "dht"	: [0,0],
                     "ph"	: self.read_ph_data()['ph']}
         dhtData = [self.dht22.temperature(), self.dht22.humidity()]
         
@@ -63,7 +68,7 @@ class Pins:
                 "ph"	: self.read_ph_data()['ph']}
     
     def read_ph_data(self):
-        if self.ph0.read_uv()==142000 and self.ph1.read_uv()==142000:
+        if int(self.ph0.read_uv())== 142000:
            self.flashPH()
            sleep(10)
         ph0 = 0 
@@ -72,9 +77,8 @@ class Pins:
             ph0 += self.ph0.read_uv() / 1e6
         
         ph0 /= 100
-        
-        data =  {"ph"	: 6.7 - (self.MID_PH - ph0) / self.CALIBRATION_FACTOR,
-                "ph0"	: ph0}
+        ph = 7 - (self.MID_PH - ph0) / self.CALIBRATION_FACTOR
+        data =  {"ph"	: ph}
         return data
         
 
@@ -92,7 +96,7 @@ class Pins:
         except Exception as e:
             print(
                 "TDS:", tds,
-                "DHT:", 18, 74,
+                "DHT:", 0, 0,
                 "ph : ", self.read_ph_data()['ph']
             )
             return
@@ -102,3 +106,4 @@ class Pins:
             "DHT:", dhtData[0], dhtData[1],
             "ph" ,  self.read_ph_data()['ph']
         )
+
